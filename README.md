@@ -1,2 +1,2 @@
 # F-Rep based library for Python 
-Currently only a small sets of SDF-based primitives and operations has been implemented. 
+Simple Python API for F-Rep based geometric modeling. 

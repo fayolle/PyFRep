@@ -1,19 +1,7 @@
 import numpy as np
+from utils import _min, _max, _length
+from utils import _normalize, _dot, _vec
 
-_min = np.minimum
-_max = np.maximum
-
-def _length(a):
-    return np.linalg.norm(a, axis=1)
-
-def _normalize(a):
-    return a / np.linalg.norm(a)
-
-def _dot(a, b):
-    return np.sum(a * b, axis=1)
-
-def _vec(*arrs):
-    return np.stack(arrs, axis=-1)
 
 def sphere(p, r):
     return r - _length(p)

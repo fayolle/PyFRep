@@ -1,0 +1,18 @@
+# Python files to ignore 
+.env
+.venv
+env/
+venv/
+__pycache__/
+*.py[cod]
+
+
+# Emacs 
+*~
+
+
+# Polyscope 
+.polyscope.ini
+imgui.ini
+
+

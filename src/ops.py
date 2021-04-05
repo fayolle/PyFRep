@@ -1,5 +1,5 @@
 import numpy as np
-from utils import _vec
+from utils import _normalize, _vec, _min, _max
 
 
 def scale(p, factor):
@@ -52,11 +52,10 @@ def scale3D(p, sx, sy, sz):
     return (p / s)
 
 def shift3D(p, dx, dy, dz):
-    np.copyto(p2, p)
-    p2[:,0] = p2[:,0] - dx
-    p2[:,1] = p2[:,1] - dy
-    p2[:,2] = p2[:,2] - dz
-    return p2
+    return p-(dx,dy,dz)
+
+def translate(p, offset):
+    return p-offset
 
 def rotate3DX(p, theta):
     np.copyto(p2, p)
@@ -75,6 +74,27 @@ def rotate3DZ(p, theta):
     p2[:,0] = p[:,0]*np.cos(theta) + p[:,1]*np.sin(theta)
     p2[:,1] = -p[:,0]*np.sin(theta) + p[:,1]*np.cos(theta)
     return p2
+
+def rotate(p, angle, vector=np.array((0, 0, 1))):
+    x, y, z = _normalize(vector)
+    s = np.sin(angle)
+    c = np.cos(angle)
+    m = 1 - c
+    matrix = np.array([
+        [m*x*x + c, m*x*y + z*s, m*z*x - y*s],
+        [m*x*y - z*s, m*y*y + c, m*y*z + x*s],
+        [m*z*x + y*s, m*y*z - x*s, m*z*z + c],
+    ]).T
+    return np.dot(p, matrix)
+
+# Transform such that (0,0,1) becomes v
+def orient(p, v):
+    v1 = np.array((0,0,1))
+    v = _normalize(v)
+    d = np.dot(v1, v)
+    a = np.arccos(d)
+    v2 = np.cross(v, v1)
+    return rotate(p, a, v2)
 
 def blendUni(f1, f2, a0, a1, a2):
     t = f1 + f2 + np.sqrt(f1**2 + f2**2)
@@ -160,3 +180,6 @@ def taperZ(p, z1, z2, s1, s2):
     p2[:,1] = p[:,1]/scale
     return p2
 
+def rep(p, c):
+    q = np.mod(p + 0.5*c, c)-0.5*c
+    return q

@@ -1,5 +1,6 @@
 from sdf_primitives import *
 from sdf_ops import *
+from ops import orient
 from mesh import *
 
 import polyscope as ps

@@ -1,9 +1,15 @@
-from sdf_primitives import *
-from sdf_ops import *
-from ops import orient
-from mesh import *
+import sys
+import os
+sys.path.append(os.path.join(os.path.dirname(__file__), "../"))
+
+import FRep
+from FRep.sdf_primitives import *
+from FRep.sdf_ops import *
+from FRep.ops import orient
+from FRep.mesh import *
 
 import polyscope as ps
+
 
 def model(p):
     sp1 = sphere(p, r=1)

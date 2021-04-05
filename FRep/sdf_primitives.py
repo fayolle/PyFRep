@@ -1,6 +1,6 @@
 import numpy as np
-from utils import _min, _max, _length
-from utils import _normalize, _dot, _vec
+from .utils import _min, _max, _length
+from .utils import _normalize, _dot, _vec
 
 
 def sphere(p, r):

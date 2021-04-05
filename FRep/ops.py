@@ -1,5 +1,5 @@
 import numpy as np
-from utils import _normalize, _vec, _min, _max
+from .utils import _normalize, _vec, _min, _max
 
 
 def scale(p, factor):

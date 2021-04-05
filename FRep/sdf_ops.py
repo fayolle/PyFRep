@@ -1,5 +1,5 @@
 import numpy as np
-from utils import _min, _max
+from .utils import _min, _max
 
 
 def union(d1, d2):

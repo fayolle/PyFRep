@@ -192,3 +192,14 @@ def superEll(p, center, a, b, c, s1, s2):
     xyp = (xp + yp)**(s2/s1)
     return 1.0 - xyp - zp
 
+def gyroid(p, alpha, beta, gamma, c):
+    X = 2.0*alpha*np.pi*p[:,0]
+    Y = 2.0*beta*np.pi*p[:,1]
+    Z = 2.0*gamma*np.pi*p[:,2]
+    return c - np.sin(X)*np.cos(Y) - np.sin(Y)*np.cos(Z) - np.sin(Z)*np.cos(X)
+
+def gyroid_sheet(p, alpha, beta, gamma, c1, c2):
+    g1 = gyroid(p, alpha, beta, gamma, c1)
+    g2 = gyroid(p, alpha, beta, gamma, c2)
+    # R-function based difference
+    return g1 - g2 - np.sqrt(g1**2 + g2**2)

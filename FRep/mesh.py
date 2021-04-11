@@ -2,7 +2,7 @@ import skimage.measure as sk
 import numpy as np
 
 
-def evalToMesh(sdf, grid_min, grid_max, cell_size):
+def evalToMesh(model, grid_min, grid_max, cell_size):
     nx = int((grid_max[0] - grid_min[0]) / cell_size)
     ny = int((grid_max[1] - grid_min[1]) / cell_size)
     nz = int((grid_max[2] - grid_min[2]) / cell_size)
@@ -15,11 +15,10 @@ def evalToMesh(sdf, grid_min, grid_max, cell_size):
 
     p = np.stack((x.reshape(-1), y.reshape(-1), z.reshape(-1)), axis=1)
 
-    d = sdf(p)
+    d = model(p)
 
     volume = d.reshape((nx,ny,nz)).transpose()
 
-    #vertices, faces, normals, _ = sk.marching_cubes_lewiner(volume, level=0)
     vertices, faces, normals, _ = sk.marching_cubes(volume, level=0)
 
     return vertices, faces, normals

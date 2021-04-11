@@ -10,10 +10,20 @@ The dependencies are:
 See also the file 'requirements.txt'
 
 ## Installation 
-Create a Python virtualenv and install the dependencies with pip
+Create a Python virtualenv
 ```bash
 python -m venv venv
+```
+activate on Windows
+```bash
 ./venv/Scripts/Activate
+```
+or OSX/Linux
+```bash
+./venv/bin/activate
+```
+and install the dependencies with pip
+```bash
 pip install -r requirements.txt
 ```
 

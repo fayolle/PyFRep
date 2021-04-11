@@ -11,7 +11,7 @@ import polyscope as ps
 
 
 def model(p):
-    b1 = block(p, vertex=np.array((-2.0, -2.0, -2.0)), dx=4.0, dy=4.0, dz=4.0)
+    b1 = block(p, vertex=(-2.0, -2.0, -2.0), dx=4.0, dy=4.0, dz=4.0)
     g2 = gyroid(p, alpha=0.5, beta=0.5, gamma=0.5, c=-1.1)
     t3 = intersection(b1, g2)
     return t3

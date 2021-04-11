@@ -7,6 +7,7 @@ The dependencies are:
 - Scikit image
 - SciPy
 - Polyscope
+- Torch
 See also the file 'requirements.txt'
 
 ## Installation 

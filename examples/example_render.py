@@ -23,7 +23,7 @@ def model(p):
     return t4
 
 print('Generating simple model')
-v,f,n = evalToMesh(model, grid_min=(-2,-2,-2), grid_max=(2,2,2), cell_size=0.04)
+v,f,n = evalToMesh(model, grid_min=(-2,-2,-2), grid_max=(2,2,2), grid_res=(64,64,64))
 print('Done')
 
 ps.init()

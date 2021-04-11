@@ -17,7 +17,7 @@ def model(p):
     return t3
 
 print('Generating simple model')
-v,f,n = evalToMesh(model, grid_min=(-3,-3,-3), grid_max=(3,3,3), cell_size=0.06)
+v,f,n = evalToMesh(model, grid_min=(-3,-3,-3), grid_max=(3,3,3), grid_res=(64,64,64))
 print('Done')
 
 ps.init()

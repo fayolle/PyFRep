@@ -2,10 +2,8 @@ import skimage.measure as sk
 import numpy as np
 
 
-def evalToMesh(model, grid_min, grid_max, cell_size):
-    nx = int((grid_max[0] - grid_min[0]) / cell_size)
-    ny = int((grid_max[1] - grid_min[1]) / cell_size)
-    nz = int((grid_max[2] - grid_min[2]) / cell_size)
+def evalToMesh(model, grid_min, grid_max, grid_res):
+    nx,ny,nz = grid_res
 
     x_ = np.linspace(grid_min[0], grid_max[0], nx)
     y_ = np.linspace(grid_min[1], grid_max[1], ny)
@@ -48,8 +46,8 @@ def writeOFF(filename, verts, faces):
     f.close()
 
 
-def writeMesh(filename, model, grid_min, grid_max, cell_size):
-    verts, faces, normals = evalToMesh(model, grid_min, grid_max, cell_size)
+def writeMesh(filename, model, grid_min, grid_max, grid_res):
+    verts, faces, normals = evalToMesh(model, grid_min, grid_max, grid_res)
     writeOFF(filename, verts, faces)
 
 

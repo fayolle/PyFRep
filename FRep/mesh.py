@@ -15,7 +15,8 @@ def evalToMesh(model, grid_min, grid_max, grid_res):
 
     d = model(p)
 
-    volume = d.reshape((nx,ny,nz)).transpose()
+    #volume = d.reshape((nx,ny,nz)).transpose()
+    volume = d.reshape((nx,ny,nz))
 
     vertices, faces, normals, _ = sk.marching_cubes(volume, level=0)
 

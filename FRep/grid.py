@@ -16,7 +16,8 @@ def npSampling(model, x, y, z):
     nz = z.shape[0]
     p = np.stack((x.reshape(-1), y.reshape(-1), z.reshape(-1)), axis=1)
     d = model(p)
-    volume = d.reshape((nx,ny,nz)).transpose()
+    #volume = d.reshape((nx,ny,nz)).transpose()
+    volume = d.reshape((nx,ny,nz))
     return volume
 
 def torchGrid(grid_min, grid_max, grid_res, device='cpu'):

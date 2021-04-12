@@ -1,5 +1,6 @@
 # F-Rep based library for Python 
 Simple Python API for F-Rep based geometric modeling. 
+This version uses Torch as a backend (instead of numpy)
 
 ## Requirements 
 The dependencies are: 
@@ -8,6 +9,7 @@ The dependencies are:
 - SciPy
 - Polyscope
 - Torch
+
 See also the file 'requirements.txt'
 
 ## Installation 

@@ -32,6 +32,3 @@ print('Done')
 ps.init()
 ps.register_surface_mesh("mesh", v, f)
 ps.show()
-
-
-

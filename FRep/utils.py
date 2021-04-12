@@ -1,16 +1,17 @@
-import numpy as np
+#import numpy as np
+import torch
 
-_min = np.minimum
-_max = np.maximum
+_min = torch.minimum
+_max = torch.maximum
 
 def _normalize(a):
-    return a / np.linalg.norm(a)
+    return a / torch.linalg.norm(a)
 
 def _vec(*arrs):
-    return np.stack(arrs, axis=-1)
+    return torch.stack(arrs, axis=-1)
 
 def _length(a):
-    return np.linalg.norm(a, axis=1)
+    return torch.linalg.norm(a, axis=1)
 
 def _dot(a, b):
-    return np.sum(a * b, axis=1)
+    return torch.sum(a * b, axis=1)

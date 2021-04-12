@@ -37,7 +37,7 @@ def torchSampling(model, x, y, z):
     resy = y.shape[1]
     resz = z.shape[2]
     dimg = resx * resy * resz
-    p = torch.stack((xx, yy, zz), dim=-1).reshape(dimg,3)
+    p = torch.stack((x, y, z), dim=-1).reshape(dimg,3)
     d = model(p)
-    volume = torch.reshape(z, (resx,resy, resz))
+    volume = torch.reshape(d, (resx, resy, resz))
     return volume

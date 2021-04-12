@@ -1,21 +1,13 @@
 import skimage.measure as sk
 import numpy as np
+import torch
+from .grid import torchGrid, torchSampling
 
 
-def evalToMesh(model, grid_min, grid_max, grid_res):
-    nx,ny,nz = grid_res
-
-    x_ = np.linspace(grid_min[0], grid_max[0], nx)
-    y_ = np.linspace(grid_min[1], grid_max[1], ny)
-    z_ = np.linspace(grid_min[2], grid_max[2], nz)
-
-    x, y, z = np.meshgrid(x_, y_, z_, indexing='ij')
-
-    p = np.stack((x.reshape(-1), y.reshape(-1), z.reshape(-1)), axis=1)
-
-    d = model(p)
-
-    volume = d.reshape((nx,ny,nz)).transpose()
+def evalToMesh(model, grid_min, grid_max, grid_res, device='cpu'):
+    x, y, z = torchGrid(grid_min, grid_max, grid_res, device)
+    volume = torchSampling(model, x, y, z)
+    volume = volume.detach().cpu().numpy()
 
     vertices, faces, normals, _ = sk.marching_cubes(volume, level=0)
 
@@ -46,8 +38,8 @@ def writeOFF(filename, verts, faces):
     f.close()
 
 
-def writeMesh(filename, model, grid_min, grid_max, grid_res):
-    verts, faces, normals = evalToMesh(model, grid_min, grid_max, grid_res)
+def writeMesh(filename, model, grid_min, grid_max, grid_res, device='cpu'):
+    verts, faces, normals = evalToMesh(model, grid_min, grid_max, grid_res, device)
     writeOFF(filename, verts, faces)
 
 

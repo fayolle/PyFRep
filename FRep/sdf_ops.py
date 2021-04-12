@@ -1,4 +1,5 @@
-import numpy as np
+#import numpy as np
+import torch
 from .utils import _min, _max
 
 
@@ -24,4 +25,4 @@ def erode(d1, r):
     return d1 - r
 
 def shell(d1, e):
-    return -np.abs(d1) + e
+    return -torch.abs(d1) + e

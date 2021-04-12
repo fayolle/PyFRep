@@ -8,6 +8,7 @@ The dependencies are:
 - SciPy
 - Polyscope
 - Torch
+
 See also the file 'requirements.txt'
 
 ## Installation 

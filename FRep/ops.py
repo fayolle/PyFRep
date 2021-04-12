@@ -101,14 +101,14 @@ def orient(p, v):
     v2 = torch.cross(v, v1)
     return rotate(p, a, v2)
 
-def blendUni(f1, f2, a0, a1, a2):
+def blendUnion(f1, f2, a0, a1, a2):
     t = f1 + f2 + torch.sqrt(f1**2 + f2**2)
     f1a1 = f1/a1
     f2a2 = f2/a2
     disp = a0 / (1.0 + f1a1**2 + f2a2**2)
     return t + disp
 
-def blendInt(f1, f2, a0, a1, a2):
+def blendIntersection(f1, f2, a0, a1, a2):
     t = f1 + f2 - torch.sqrt(f1**2 + f2**2)
     f1a1 = f1/a1
     f2a2 = f2/a2

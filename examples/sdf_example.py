@@ -7,6 +7,7 @@ from FRep.sdf_primitives import *
 from FRep.sdf_ops import *
 from FRep.ops import orient
 from FRep.mesh import *
+from FRep.IO import writeOFF
 
 
 def model(p):
@@ -24,7 +25,8 @@ def model(p):
     return t4
 
 print('Generating simple model')
-writeMesh('simple.off', model, grid_min=(-2,-2,-2), grid_max=(2,2,2), grid_res=(64,64,64))
+v,f,n = evalToMesh(model, grid_min=(-2,-2,-2), grid_max=(2,2,2), grid_res=(64,64,64))
+writeOFF('simple.off', v, f)
 print('Done')
 
 

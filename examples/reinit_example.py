@@ -15,7 +15,7 @@ def model(p):
 
 
 modelNN = trainPPoisson(num_iters=1, fun=model, grid_min=(-2.0,-2.0,-2.0), grid_max=(2.0,2.0,2.0), p=2, device='cpu')
-xyz = torchLinearGrid(grid_min=(-2.0,-2.0,-2.0), grid_max=(2.0,2.0,2.0), grid_res=(64,64,64), device='cpu')
+xyz = torchLinearGrid(grid_min=(-2.0,-2.0,-2.0), grid_max=(2.0,2.0,2.0), grid_res=(16,16,16), device='cpu')
 f = torchLinearSampling(modelNN, xyz)
-saveVTK('test.vtk', xyz, (64,64,64), f)
+saveVTK('test.vtk', xyz, (16,16,16), f)
 

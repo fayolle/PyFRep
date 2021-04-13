@@ -43,8 +43,7 @@ class ImplicitNN(nn.Module):
 
     def forward(self, input):
         # to take deriv. wrt input
-        coords = input.clone().detach().requires_grad_(True) 
-        x = coords
+        x = input
         for layer in range(0, self.num_layers - 1):
             lin = getattr(self, "lin" + str(layer))
             if layer in self.skip_in:
@@ -52,9 +51,10 @@ class ImplicitNN(nn.Module):
             x = lin(x)
             if layer < self.num_layers - 2:
                 x = self.activation(x)
-        x = x * torch.tanh(0.1*self.fun(coords))
-        #x = x * self.fun(coords)
-        return x, coords
+        fun_sign = torch.tanh(0.1*self.fun(input))
+        fun_sign = fun_sign.reshape(x.shape)
+        x = x * fun_sign
+        return x
 
 def loadModel(path, dim=3, device='cpu'):
     model = ImplicitNN(dim).to(device)
@@ -94,7 +94,7 @@ def trainPPoisson(num_iters, fun, grid_min, grid_max, p=2, device='cpu'):
     model = ImplicitNN(fun=fun, dimension=dimension).to(device)
     optimizer = torch.optim.Adam(model.parameters(), lr=0.0001)
 
-    n_samples = 1000
+    n_samples = 1024
     loss = 0
 
     # regular Ggrid data
@@ -105,11 +105,12 @@ def trainPPoisson(num_iters, fun, grid_min, grid_max, p=2, device='cpu'):
     for i in range(0, num_iters):
         # Uniform samples
         x = uniformSamples(n_samples, grid_min, grid_max, device)
+        x.requires_grad = True
     
         model.train()
         optimizer.zero_grad()
     
-        f_d, coords_d = model(x)
+        f_d = model(x)
     
         # Laplacian 
         #lap = laplacian(f_d, coords_d)
@@ -140,7 +141,7 @@ def trainEikonal(num_iters, fun, grid_min, grid_max, p=2, device='cpu'):
     model = ImplicitNN(fun=fun, dimension=dimension).to(device)
     optimizer = torch.optim.Adam(model.parameters(), lr=0.0001)
     
-    n_samples = 1000
+    n_samples = 1024
     loss = 0
 
     # regular Ggrid data
@@ -151,11 +152,12 @@ def trainEikonal(num_iters, fun, grid_min, grid_max, p=2, device='cpu'):
     for i in range(0, num_iters):
         # Uniform samples
         x = uniform_samples(n_samples, grid_min, grid_max, device)
+        x.requires_grad = True
     
         model.train()
         optimizer.zero_grad()
     
-        f_d, coords_d = model(x)
+        f_d = model(x)
 
         g_d = grad(f_d, coords_d)
         g_norm = (g_d.norm(2, dim=1) - 1)**2

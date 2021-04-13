@@ -1,4 +1,5 @@
 import numpy as np
+import torch
 
 
 def writeOFF(filename, verts, faces):
@@ -70,3 +71,36 @@ def readPointCloud(filename):
         data = np.loadtxt(f)
         
     return data
+
+
+# Save field
+def saveVTK(filename, xyz, res, field):
+    resx, resy, resz = res
+    
+    field_title = 'VALUE'
+
+    with open(filename, 'w') as f:
+        f.write('# vtk DataFile Version 3.0\n')
+        f.write('vtk output\n')
+        f.write('ASCII\n')
+        f.write('DATASET STRUCTURED_GRID\n')
+        f.write('DIMENSIONS ' + str(resx) + ' ' + str(resy) + ' ' + str(resz) +'\n')
+        f.write('POINTS ' + str(resx*resy*resz) + ' double\n')
+
+        if (torch.is_tensor(xyz)):
+            np.savetxt(f, xyz.detach().cpu().numpy())
+        else:
+            np.savetxt(f, xyz)
+    
+        f.write('\n\n')
+
+        f.write('POINT_DATA ' + str(resx*resy*resz) + '\n')
+        f.write('SCALARS ' + field_title + ' double' + '\n')
+        f.write('LOOKUP_TABLE default\n')
+        
+        if (torch.is_tensor(field)):
+            np.savetxt(f, field.detach().cpu().numpy())
+        else:
+            np.savetxt(f, field)
+        f.write('\n')
+

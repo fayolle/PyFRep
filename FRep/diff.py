@@ -15,6 +15,16 @@ def Laplacian(y, x):
     g = grad(y, x)
     return div(g, x)
 
+def pLaplacian(y, x, p=2):
+    g = grad(y, x)
+    #g_n = g.norm(2, dim=1)
+    g_n = torch.linalg.norm(g, 2, dim=1)
+    g_n = g_n**(p-2)
+    g_n = torch.reshape(g_n, (g.shape[0],1))
+    g = g_n * g
+    return div(g, x)
+
+
 '''
 # Example of use
 def f(x):

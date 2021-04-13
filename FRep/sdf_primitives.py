@@ -14,6 +14,7 @@ def plane(p, normal=(0.0, 0.0, 1.0), point=(0.0, 0.0, 0.0)):
     return -torch.dot(point - p, normal)
 
 def box(p, b):
+    b = torch.tensor(b)
     q = torch.abs(p) - b
     z = torch.zeros_like(q)
     t1 = _length(_max(q, z))
@@ -27,6 +28,7 @@ def box(p, b):
     #return -(_length(_max(q, z)) + _min(torch.amax(q, axis=1), z))
 
 def roundedBox(p, b, radius):
+    b = torch.tensor(b)
     q = torch.abs(p) - b
     z = torch.zeros_like(q)
     t1 = _length(_max(q, z))
@@ -87,4 +89,4 @@ def cappedCone(p, a, b, ra, rb):
     cby = paba - f
     s = torch.where(torch.logical_and(cbx < 0, cay < 0), -1, 1)
     return -s * torch.sqrt(_min(cax * cax + cay * cay * baba,cbx * cbx + cby * cby * baba))
-
+    

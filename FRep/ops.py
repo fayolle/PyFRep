@@ -58,19 +58,19 @@ def translate(p, offset):
     return p-offset
 
 def rotate3DX(p, theta):
-    p2 = p.detach().clone()
+    p2 = p.clone()
     p2[:,1] = p[:,1]*torch.cos(theta) + p[:,2]*torch.sin(theta)
     p2[:,2] = -p[:,1]*torch.sin(theta) + p[:,2]*torch.cos(theta)
     return p2
 
 def rotate3DY(p, theta):
-    p2 = p.detach().clone()
+    p2 = p.clone()
     p2[:,2] = p[:,2]*torch.cos(theta) + p[:,0]*torch.sin(theta)
     p2[:,0] = -p[:,2]*torch.sin(theta) + p[:,0]*torch.cos(theta)
     return p2
 
 def rotate3DZ(p, theta):
-    p2 = p.detach().clone()
+    p2 = p.clone()
     p2[:,0] = p[:,0]*torch.cos(theta) + p[:,1]*torch.sin(theta)
     p2[:,1] = -p[:,0]*torch.sin(theta) + p[:,1]*torch.cos(theta)
     return p2
@@ -116,7 +116,7 @@ def blendIntersection(f1, f2, a0, a1, a2):
     return t + disp
 
 def twistX(p, x1, x2, theta1, theta2):
-    p2 = p.detach().clone()
+    p2 = p.clone()
     t = (p[:,0]-x1)/(x2-x1)
     theta = (1.0-t)*theta1 + t*theta2
     p2[:,1] = p[:,1]*torch.cos(theta) + p[:,2]*torch.sin(theta)
@@ -124,7 +124,7 @@ def twistX(p, x1, x2, theta1, theta2):
     return p2
 
 def twistY(p, y1, y2, theta1, theta2):
-    p2 = p.detach().clone()
+    p2 = p.clone()
     t = (p[:,1]-y1)/(y2-y1)
     theta = (1.0-t)*theta1 + t*theta2
     p2[:,2] = p[:,2]*torch.cos(theta) + p[:,0]*torch.sin(theta)
@@ -132,7 +132,7 @@ def twistY(p, y1, y2, theta1, theta2):
     return p2
 
 def twistZ(p, z1, z2, theta1, theta2):
-    p2 = p.detach().clone()
+    p2 = p.clone()
     t = (p[:,1]-z1)/(z2-z1)
     theta = (1.0-t)*theta1 + t*theta2
     p2[:,0] = p[:,0]*torch.cos(theta) + p[:,1]*torch.sin(theta)
@@ -140,14 +140,14 @@ def twistZ(p, z1, z2, theta1, theta2):
     return p2
 
 def stretch3D(p, x0, sx, sy, sz):
-    p2 = p.detach().clone()
+    p2 = p.clone()
     p2[:,0] = x0[0]+(p[:,0]-x0[0])/sx
     p2[:,1] = x0[1]+(p[:,1]-x0[1])/sy 
     p2[:,2] = x0[2]+(p[:,2]-x0[2])/sz
     return p2
 
 def taperX(p, x1, x2, s1, s2):
-    p2 = p.detach().clone()
+    p2 = p.clone()
     scale = torch.zeros((p.shape[0],1))
     scale[:] = s1
     idx = (p[:,0]>x2)
@@ -160,7 +160,7 @@ def taperX(p, x1, x2, s1, s2):
     return p2
 
 def taperY(p, y1, y2, s1, s2):
-    p2 = p.detach().clone()
+    p2 = p.clone()
     scale = torch.zeros((p.shape[0],1))
     scale[:] = s1
     idx = (p[:,1]>y2)
@@ -173,7 +173,7 @@ def taperY(p, y1, y2, s1, s2):
     return p2
 
 def taperZ(p, z1, z2, s1, s2):
-    p2 = p.detach().clone()
+    p2 = p.clone()
     scale = torch.zeros((p.shape[0],1))
     scale[:] = s1
     idx = (p[:,2]>z2)

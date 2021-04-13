@@ -113,11 +113,11 @@ def trainPPoisson(num_iters, fun, grid_min, grid_max, p=2, device='cpu'):
         f_d = model(x)
     
         # Laplacian 
-        #lap = laplacian(f_d, coords_d)
+        #lap = laplacian(f_d, x)
         #loss = torch.mean((lap + 1)**2)
 
         # p-Laplacian
-        lap = pLaplacian(f_d, coords_d, p)
+        lap = pLaplacian(f_d, x, p)
         loss = torch.mean((lap+1)**2)
         
         #if i%500 == 0:
@@ -159,7 +159,7 @@ def trainEikonal(num_iters, fun, grid_min, grid_max, p=2, device='cpu'):
     
         f_d = model(x)
 
-        g_d = grad(f_d, coords_d)
+        g_d = grad(f_d, x)
         g_norm = (g_d.norm(2, dim=1) - 1)**2
         loss = torch.mean(g_norm)
         

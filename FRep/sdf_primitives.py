@@ -61,7 +61,13 @@ def capsule(p, a, b, radius):
     h = torch.clip(torch.dot(pa, ba) / torch.dot(ba, ba), 0.0, 1.0).reshape((-1, 1))
     return radius - _length(pa - torch.multiply(ba, h))
 
-def cylinder(p, r):
+def cylinderX(p, r):
+    return r - _length(p[:,[1,2]])
+
+def cylinderY(p, r):
+    return r - _length(p[:,[0,2]])
+
+def cylinderZ(p, r):
     return r - _length(p[:,[0,1]])
 
 def cappedCylinder(p, a, b, radius):
@@ -154,3 +160,29 @@ def coneZ(x, center, r):
     zt = x[:,2] - center[2]
     dist = torch.sqrt(xt*xt+yt*yt)*ct - torch.abs(zt)*st
     return -dist
+
+# General cylinder
+# Pass through point 'center' in direction 'u' with radius 'r'
+def cylinder(x, center, u, r):
+    if not torch.is_tensor(center):
+        center = torch.tensor(center)
+    if not torch.is_tensor(u):
+        u = torch.tensor(u)
+    
+    cu = center + u
+    cmx = center - x
+
+    # broadcast for the cross-product
+    ub = torch.zeros_like(cmx)
+    ub[:] = u
+    cp = torch.cross(ub, cmx)
+
+    d1 = cp[:,0]**2 + cp[:,1]**2 + cp[:,2]**2
+    d2 = u[0]**2 + u[0]**2 + u[2]**2
+
+    d = d1/d2
+    d = torch.sqrt(d)
+
+    f = r - d
+    return f
+

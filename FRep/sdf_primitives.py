@@ -186,3 +186,35 @@ def cylinder(x, center, u, r):
     f = r - d
     return f
 
+def torusX(x, center, R, r0):
+    if not torch.is_tensor(center):
+        center = torch.tensor(center)
+
+    x2 = x - center
+    dyz = torch.sqrt(x2[:,1]**2 + x2[:,2]**2)
+    dyz = dyz - R
+    dyzx = torch.sqrt(dyz**2 + x2[:,0]**2)
+    dyzx = dyzx - r0
+    return (-dyzx)
+
+def torusY(x, center, R, r0):
+    if not torch.is_tensor(center):
+        center = torch.tensor(center)
+
+    x2 = x - center
+    dxz = torch.sqrt(x2[:,0]**2 + x2[:,2]**2)
+    dxz = dxz - R
+    dxzy = torch.sqrt(dxz**2 + x2[:,1]**2)
+    dxzy = dxzy - r0
+    return (-dxzy)
+
+def torusZ(x, center, R, r0):
+    if not torch.is_tensor(center):
+        center = torch.tensor(center)
+
+    x2 = x - center
+    dxy = torch.sqrt(x2[:,0]**2 + x2[:,1]**2)
+    dxy = dxy - R
+    dxyz = torch.sqrt(dxy**2 + x2[:,2]**2)
+    dxyz = dxyz - r0
+    return (-dxyz)

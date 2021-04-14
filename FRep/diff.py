@@ -2,10 +2,23 @@ import torch
 import torch.autograd as autograd
 
 
+# Given y = f(x), compute grad(f)(x)
 def grad(y, x):
     g = autograd.grad(y, [x], grad_outputs=torch.ones_like(y), create_graph=True)[0]
     return g
 
+# Given a function f, and a variable x,
+# compute y = f(x) and g = grad(f)(x).
+# Return (y, g)
+def fun_grad(f, x):
+    if not torch.is_tensor(x):
+        x = torch.tensor(x)
+    x.requires_grad = True
+    y = f(x)
+    g = grad(y, x)
+    return (y, g)
+
+# Given a vector field y = v(x), compute div y
 def div(y, x):
     div = 0.0
     for i in range(y.shape[-1]):

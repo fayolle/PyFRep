@@ -1,5 +1,5 @@
 # F-Rep based library for Python 
-Simple Python API for F-Rep based geometric modeling. 
+Simple Python API for (differentiable) F-Rep based geometric modeling. 
 
 ## Requirements 
 The dependencies are: 

@@ -3,9 +3,6 @@ import torch
 import math
 
 
-# Non SDF primitives
-# The syntax mimics the HF library
-
 def sphere(p, center, r):
     x0 = p[:,0] - center[0]
     x1 = p[:,1] - center[1]

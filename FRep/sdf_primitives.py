@@ -4,8 +4,10 @@ from .utils import _min, _max, _length
 from .utils import _normalize, _dot, _vec
 
 
-def sphere(p, r):
-    return r - _length(p)
+def sphere(p, center, r):
+    if not torch.is_tensor(center):
+        center = torch.tensor(center)
+    return r - _length(p-center)
 
 def plane(p, normal=(0.0, 0.0, 1.0), point=(0.0, 0.0, 0.0)):
     if not torch.is_tensor(normal):
@@ -61,14 +63,20 @@ def capsule(p, a, b, radius):
     h = torch.clip(torch.dot(pa, ba) / torch.dot(ba, ba), 0.0, 1.0).reshape((-1, 1))
     return radius - _length(pa - torch.multiply(ba, h))
 
-def cylinderX(p, r):
-    return r - _length(p[:,[1,2]])
+def cylinderX(p, center, r):
+    if not torch.is_tensor(center):
+        center = torch.tensor(center)
+    return r - _length(p[:,[1,2]] - center[[1,2]])
 
-def cylinderY(p, r):
-    return r - _length(p[:,[0,2]])
+def cylinderY(p, center, r):
+    if not torch.is_tensor(center):
+        center = torch.tensor(center)
+    return r - _length(p[:,[0,2]] - center[[0,2]])
 
-def cylinderZ(p, r):
-    return r - _length(p[:,[0,1]])
+def cylinderZ(p, center, r):
+    if not torch.is_tensor(center):
+        center = torch.tensor(center)
+    return r - _length(p[:,[0,1]] - center[[0,1]])
 
 def cappedCylinder(p, a, b, radius):
     if not torch.is_tensor(a):

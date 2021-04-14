@@ -19,3 +19,6 @@ imgui.ini
 # Data 
 data/
 
+
+# Temp result files
+results/

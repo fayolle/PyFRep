@@ -19,7 +19,7 @@ import polyscope as ps
 
 
 def model(p):
-    sp1 = sphere(p, center=(0,0,0), r=2)
+    sp1 = sphere(p, center=(0,0,0), r=1)
     return sp1
 
 # Generate the mesh

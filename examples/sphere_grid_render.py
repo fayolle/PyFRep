@@ -37,7 +37,7 @@ def model(p):
     yrods = intersection(xslabs, zslabs)
     zrods = intersection(xslabs, yslabs)
     grid = union(blendUnion(xrods, zrods, 1.0, 3.0, 3.0), yrods)
-    sphere_grid = intersection(union(sp_shell, intersection(sp, grid)), x1)
+    sphere_grid = intersection(union(sp_shell, intersection(sp, grid)), -x1)
     return sphere_grid
 
 

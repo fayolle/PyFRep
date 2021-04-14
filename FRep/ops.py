@@ -1,4 +1,5 @@
 import torch
+import math
 from .utils import _normalize, _vec, _min, _max
 
 
@@ -186,7 +187,37 @@ def taperZ(p, z1, z2, s1, s2):
     return p2
 
 def rep(p, c):
+    if not torch.is_tensor(c):
+        c = torch.tensor(c)
     q = torch.fmod(p + 0.5*c, c)-0.5*c
     # or
     #q = torch.remainder(p + 0.5*c, c)-0.5*c
     return q
+
+def boundBlendUnion(f1, f2, f3, a0, a1, a2, a3):
+    r1 = f1**2/a1**2 + f2**2/a2**2
+    tmp_f3 = f3**2/a3**2
+    r2 = torch.zeros_like(f1)
+    f3p_idx = f3 > 0.0
+    r2[f3p_idx] = tmp_f3[f3p_idx]
+    rr = torch.zeros_like(f1)
+    r1p_idx = r1 > 0.0
+    rr[r1p_idx] = r1[r1p_idx]/(r1[r1p_idx] + r2[r1p_idx])
+    d = torch.zeros_like(f1)
+    rr_idx = rr < 1.0
+    d[rr_idx] = a0*(1.0 - rr[rr_idx])**3 / (1.0 + rr[rr_idx])
+    return f1 + f2 + torch.sqrt(f1**2 + f2**2) + d
+
+# T is the period of the wave
+# Output is in [-1,1]
+def sawtooth(p, T):
+    if not torch.is_tensor(T):
+        T = torch.tensor(T)
+    return 2.0*(0.5 - torch.atan(1.0/torch.tan(math.pi*(p/T - 0.5)))/math.pi) - 1.0
+
+# T is the period of the triangle wave
+# Output is in [-1,1]
+def triangleWave(p, T):
+    if not torch.is_tensor(T):
+        T = torch.tensor(T)
+    return 2.0/math.pi*torch.asin(torch.sin(math.pi*(2.0*p/T - 0.5)))

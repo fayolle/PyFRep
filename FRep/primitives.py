@@ -87,7 +87,7 @@ def metaBall(p, p0, y0, z0, b, d, T):
         xx1 = p[:,1] - y0[i]
         xx2 = p[:,2] - z0[i]
         r = xx0**2 + xx1**2 + xx2**2
-        
+
         idx1 = (r <= d[i]/3.0)
         idx2 = (r <= d[i]) & ~idx1
         s[idx1] = s[idx1] + b[i]*(1.0 - 3.0*r/d[i]*d[i])
@@ -131,7 +131,7 @@ def ellConeX(p, center, a, b):
     yy = (p[:,1] - center[1])/a
     zz = (p[:,2] - center[2])/b
     return xx**2 - yy**2 - zz**2
-    
+
 def ellConeY(p, center, a, b):
     xx = (p[:,0] - center[0])/a
     yy = p[:,1] - center[1]
@@ -202,3 +202,134 @@ def gyroid_sheet(p, alpha, beta, gamma, c1, c2):
     g2 = gyroid(p, alpha, beta, gamma, c2)
     # R-function based difference
     return g1 - g2 - torch.sqrt(g1**2 + g2**2)
+
+"""
+x - point coordinates
+ vect - array of skeleton points' coordinates
+ S - array of kernel width control parameters for each point
+ T - threshold
+"""
+def convPoint (p,vect,S,T):
+    X =  p[:,0]
+    Y =  p[:,1]
+    Z =  p[:,2]
+
+    f = 0.0
+    # number of points
+    N = len (S)
+    for n in range(0,N):
+        pointX = vect[ 3*n+0 ]
+        pointY = vect[ 3*n+1 ]
+        pointZ = vect[ 3*n+2 ]
+        r2 = (pointX - X)**2 + (pointY - Y)**2 + (pointZ - Z)**2
+        kernelS = S[n]
+        f +=  1/ (1 + kernelS**2 *r2)**2
+
+    return f - T
+
+"""  
+Primitive:  Аnalytical convolution for a segment with Cauchy kernel [McCormack and Sherstyuk 1998]
+#
+#    Definition:  1 / (1 + S^2*R^2)^2
+#                 R is the distance between primitive and x
+#
+#    Parameters:  
+#                 x - points coordinate array
+#                 begin - beginning points coordinate array
+#                 end - ending points coordinate array
+#                 S - control value for width of the kernel
+#                 T - threshold value
+#    
+"""
+def convLine (p,begin,end,S,T):
+    if not torch.is_tensor(begin):
+        beginT = torch.tensor(begin)
+
+        if not torch.is_tensor(end):
+            endT = torch.tensor(end)
+
+    X =  p[:,0]
+    Y =  p[:,1]
+    Z =  p[:,2]
+
+    f = 0.0
+    # the number of primitive
+    N = len (S)
+    for n in range(0,N):
+        l = torch.sqrt((endT[3 * n] - beginT[3 * n])**2 + (endT[3 * n + 1] - beginT[3 * n + 1])**2 + (
+            endT[3 * n + 2] - beginT[3 * n + 2])**2 )
+
+        if l == 0.0:
+            return 0
+
+        # *normalized vector from beginnig to ending  Point
+        ax = (end[3 * n] - begin[3 * n]) / l
+        ay = (end[3 * n + 1] - begin[3 * n + 1]) / l
+        az = (end[3 * n + 2] - begin[3 * n + 2]) / l
+        # d = r - b
+        dx = X - begin[3 * n]
+        dy = Y - begin[3 * n + 1]
+        dz = Z - begin[3 * n + 2]
+
+        xx = dx * ax + dy * ay + dz * az
+        p = torch.sqrt(1 + S[n] * S[n] * (dx * dx + dy * dy + dz * dz - xx * xx))
+        q = torch.sqrt(1 + S[n] * S[n] * (dx * dx + dy * dy + dz * dz + l * l - 2 * l * xx))
+
+        f += xx / (2 * p * p * (p * p + S[n] * S[n] * xx * xx)) + (l - xx) / (2 * p * p * q * q) + (torch.atan(S[n] * xx / p) + torch.atan(S[n] * (l - xx) / p)) / (2 * S[n] * p * p * p)
+
+
+    return f - T
+
+"""  
+Primitive: Cauchy Curve (connected line) with Convolution Surface
+
+#    Primitive:  Cauchy Curve (connected line) with Convolution Surface
+#
+#    Definition:  1 / (1 + S^2*R^2)^2
+#                 R is the distance between primitive and x
+# 
+#    Parameters:  
+#                 x - points coordinate array
+#                 vect[n] - beginning points coordinate array
+#                 vect[n+1] - ending points coordinate array
+#                 S - control value for width of the kernel
+#                 T - threshold value
+#    
+"""
+def convCurve (p,vect,S,T):
+    if not torch.is_tensor(vect):
+        vectT = torch.tensor(vect)
+
+    X =  p[:,0]
+    Y =  p[:,1]
+    Z =  p[:,2]
+
+    f = 0.0
+    # the number of primitive
+    N = len (S)
+    for n in range(0,N):
+        l = torch.sqrt((vectT[3 * (n + 1)] - vectT[3 * n])**2 + (vectT[3 * (n + 1) + 1] - vectT[3 * n + 1])**2 + (
+            vectT[3 * (n + 1) + 2] - vectT[3 * n + 2])**2)
+
+
+        if l == 0.0:
+            return 0
+
+        # *normalized vector from beginnig to ending  Point
+        ax = (vect[3 * (n + 1)] - vect[3 * n]) / l
+        ay = (vect[3 * (n + 1) + 1] - vect[3 * n + 1]) / l
+        az = (vect[3 * (n + 1) + 2] - vect[3 * n + 2]) / l
+        # d = r - b
+        dx = X - vect[3 * n]
+        dy = Y - vect[3 * n + 1]
+        dz = Z - vect[3 * n + 2]
+
+        xx = dx * ax + dy * ay + dz * az
+        p = torch.sqrt(1 + S[n] * S[n] * (dx * dx + dy * dy + dz * dz - xx * xx))
+        q = torch.sqrt(1 + S[n] * S[n] * (dx * dx + dy * dy + dz * dz + l * l - 2 * l * xx))
+
+        f += xx / (2 * p * p * (p * p + S[n] * S[n] * xx * xx)) + (l - xx) / (2 * p * p * q * q) + (torch.atan(S[n] * xx / p) + torch.atan(S[n] * (l - xx) / p)) / (2 * S[n] * p * p * p)
+
+
+    return f - T
+

@@ -203,66 +203,74 @@ def gyroid_sheet(p, alpha, beta, gamma, c1, c2):
     # R-function based difference
     return g1 - g2 - torch.sqrt(g1**2 + g2**2)
 
-"""
-x - point coordinates
- vect - array of skeleton points' coordinates
- S - array of kernel width control parameters for each point
- T - threshold
-"""
-def convPoint (p,vect,S,T):
-    X =  p[:,0]
-    Y =  p[:,1]
-    Z =  p[:,2]
+def convPoint(p, vect, S, T):
+    '''
+    p - point coordinates
+    vect - array of skeleton points' coordinates
+    S - array of kernel width control parameters for each point
+    T - threshold
+    '''
+
+    if not torch.is_tensor(vect):
+        vect = torch.tensor(vect)
+    if not torch.is_tensor(S):
+        S = torch.tensor(S)
+    
+    X = p[:,0]
+    Y = p[:,1]
+    Z = p[:,2]
 
     f = 0.0
     # number of points
-    N = len (S)
-    for n in range(0,N):
-        pointX = vect[ 3*n+0 ]
-        pointY = vect[ 3*n+1 ]
-        pointZ = vect[ 3*n+2 ]
+    N = len(S)
+    for n in range(N):
+        pointX = vect[3*n+0]
+        pointY = vect[3*n+1]
+        pointZ = vect[3*n+2]
         r2 = (pointX - X)**2 + (pointY - Y)**2 + (pointZ - Z)**2
         kernelS = S[n]
-        f +=  1/ (1 + kernelS**2 *r2)**2
+        f = f + 1.0 / (1.0 + kernelS**2 * r2)**2
 
     return f - T
 
-"""  
-Primitive:  Аnalytical convolution for a segment with Cauchy kernel [McCormack and Sherstyuk 1998]
-#
-#    Definition:  1 / (1 + S^2*R^2)^2
-#                 R is the distance between primitive and x
-#
-#    Parameters:  
-#                 x - points coordinate array
-#                 begin - beginning points coordinate array
-#                 end - ending points coordinate array
-#                 S - control value for width of the kernel
-#                 T - threshold value
-#    
-"""
-def convLine (p,begin,end,S,T):
+def convLine(p, begin, end, S, T):
+    '''  
+    Primitive: Аnalytical convolution for a segment with Cauchy kernel 
+    [McCormack and Sherstyuk 1998]
+    Definition:  1 / (1 + S^2*R^2)^2
+                 R is the distance between primitive and x
+    Parameters:  
+                 p - points coordinate array
+                 begin - beginning points coordinate array
+                 end - ending points coordinate array
+                 S - control value for width of the kernel
+                 T - threshold value
+    '''
+
     if not torch.is_tensor(begin):
-        beginT = torch.tensor(begin)
+        begin = torch.tensor(begin)
 
-        if not torch.is_tensor(end):
-            endT = torch.tensor(end)
+    if not torch.is_tensor(end):
+        end = torch.tensor(end)
 
-    X =  p[:,0]
-    Y =  p[:,1]
-    Z =  p[:,2]
+    if not torch.is_tensor(S):
+        S = torch.tensor(S)
+
+    X = p[:,0]
+    Y = p[:,1]
+    Z = p[:,2]
 
     f = 0.0
+
     # the number of primitive
-    N = len (S)
+    N = len(S)
     for n in range(0,N):
-        l = torch.sqrt((endT[3 * n] - beginT[3 * n])**2 + (endT[3 * n + 1] - beginT[3 * n + 1])**2 + (
-            endT[3 * n + 2] - beginT[3 * n + 2])**2 )
+        l = torch.sqrt((end[3 * n] - begin[3 * n])**2 + (end[3 * n + 1] - begin[3 * n + 1])**2 + (end[3 * n + 2] - begin[3 * n + 2])**2 )
 
         if l == 0.0:
             return 0
-
-        # *normalized vector from beginnig to ending  Point
+        
+        # normalized vector from beginnig to ending  Point
         ax = (end[3 * n] - begin[3 * n]) / l
         ay = (end[3 * n + 1] - begin[3 * n + 1]) / l
         az = (end[3 * n + 2] - begin[3 * n + 2]) / l
@@ -275,47 +283,41 @@ def convLine (p,begin,end,S,T):
         p = torch.sqrt(1 + S[n] * S[n] * (dx * dx + dy * dy + dz * dz - xx * xx))
         q = torch.sqrt(1 + S[n] * S[n] * (dx * dx + dy * dy + dz * dz + l * l - 2 * l * xx))
 
-        f += xx / (2 * p * p * (p * p + S[n] * S[n] * xx * xx)) + (l - xx) / (2 * p * p * q * q) + (torch.atan(S[n] * xx / p) + torch.atan(S[n] * (l - xx) / p)) / (2 * S[n] * p * p * p)
-
+        f += xx / (2.0 * p * p * (p * p + S[n] * S[n] * xx * xx)) + (l - xx) / (2.0 * p * p * q * q) + (torch.atan(S[n] * xx / p) + torch.atan(S[n] * (l - xx) / p)) / (2.0 * S[n] * p * p * p)
 
     return f - T
 
-"""  
-Primitive: Cauchy Curve (connected line) with Convolution Surface
-
-#    Primitive:  Cauchy Curve (connected line) with Convolution Surface
-#
-#    Definition:  1 / (1 + S^2*R^2)^2
-#                 R is the distance between primitive and x
-# 
-#    Parameters:  
-#                 x - points coordinate array
-#                 vect[n] - beginning points coordinate array
-#                 vect[n+1] - ending points coordinate array
-#                 S - control value for width of the kernel
-#                 T - threshold value
-#    
-"""
-def convCurve (p,vect,S,T):
+def convCurve(p, vect, S, T):
+    '''
+    Primitive: Cauchy Curve (connected line) with Convolution Surface
+    Definition:  1 / (1 + S^2*R^2)^2
+                 R is the distance between primitive and x
+    Parameters:  
+                 p - points coordinate array
+                 vect[n] - beginning points coordinate array
+                 vect[n+1] - ending points coordinate array
+                 S - control value for width of the kernel
+                 T - threshold value
+    '''
+    
     if not torch.is_tensor(vect):
-        vectT = torch.tensor(vect)
+        vect = torch.tensor(vect)
 
     X =  p[:,0]
     Y =  p[:,1]
     Z =  p[:,2]
 
     f = 0.0
+    
     # the number of primitive
     N = len (S)
     for n in range(0,N):
-        l = torch.sqrt((vectT[3 * (n + 1)] - vectT[3 * n])**2 + (vectT[3 * (n + 1) + 1] - vectT[3 * n + 1])**2 + (
-            vectT[3 * (n + 1) + 2] - vectT[3 * n + 2])**2)
-
-
+        l = torch.sqrt((vect[3 * (n + 1)] - vect[3 * n])**2 + (vect[3 * (n + 1) + 1] - vect[3 * n + 1])**2 + (vect[3 * (n + 1) + 2] - vect[3 * n + 2])**2)
+        
         if l == 0.0:
             return 0
 
-        # *normalized vector from beginnig to ending  Point
+        # normalized vector from beginnig to ending point
         ax = (vect[3 * (n + 1)] - vect[3 * n]) / l
         ay = (vect[3 * (n + 1) + 1] - vect[3 * n + 1]) / l
         az = (vect[3 * (n + 1) + 2] - vect[3 * n + 2]) / l
@@ -328,8 +330,7 @@ def convCurve (p,vect,S,T):
         p = torch.sqrt(1 + S[n] * S[n] * (dx * dx + dy * dy + dz * dz - xx * xx))
         q = torch.sqrt(1 + S[n] * S[n] * (dx * dx + dy * dy + dz * dz + l * l - 2 * l * xx))
 
-        f += xx / (2 * p * p * (p * p + S[n] * S[n] * xx * xx)) + (l - xx) / (2 * p * p * q * q) + (torch.atan(S[n] * xx / p) + torch.atan(S[n] * (l - xx) / p)) / (2 * S[n] * p * p * p)
-
+        f += xx / (2.0 * p * p * (p * p + S[n] * S[n] * xx * xx)) + (l - xx) / (2.0 * p * p * q * q) + (torch.atan(S[n] * xx / p) + torch.atan(S[n] * (l - xx) / p)) / (2.0 * S[n] * p * p * p)
 
     return f - T
 

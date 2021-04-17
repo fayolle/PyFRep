@@ -108,12 +108,16 @@ def trainPPoisson(num_iters, fun, grid_min, grid_max, p=2, device='cpu'):
     # regular Ggrid data
     #res = (16,16,16)
     #x = grid_samples(res, grid_min, grid_max, device)
+    #x.requires_grad = True
 
     # Train network
     for i in range(0, num_iters):
         # Uniform samples
         x = uniformSamples(n_samples, grid_min, grid_max, device)
         x.requires_grad = True
+
+        # Input implicit
+        fun_d = fun(x)
 
         model.train()
         optimizer.zero_grad()
@@ -126,7 +130,15 @@ def trainPPoisson(num_iters, fun, grid_min, grid_max, p=2, device='cpu'):
 
         # p-Laplacian
         lap = pLaplacian(f_d, x, p)
-        loss = torch.mean((lap + 1)**2)
+        lap_constraint = torch.mean((lap + 1)**2)
+
+        # Penalize extra zeros
+        extra_constraint = torch.mean(
+            torch.where(
+                torch.abs(fun_d) < 1e-3, torch.zeros_like(f_d),
+                torch.exp(-1e2 * torch.abs(f_d))))
+
+        loss = lap_constraint + extra_constraint
 
         #if i%500 == 0:
         #print(loss)
@@ -156,12 +168,16 @@ def trainEikonal(num_iters, fun, grid_min, grid_max, p=2, device='cpu'):
     # regular Ggrid data
     #res = (16,16,16)
     #x = grid_samples(res, grid_min, grid_max, device)
+    #x.requires_grad = True
 
     # Train network
     for i in range(0, num_iters):
         # Uniform samples
         x = uniform_samples(n_samples, grid_min, grid_max, device)
         x.requires_grad = True
+
+        # Input implicit
+        fun_d = fun(x)
 
         model.train()
         optimizer.zero_grad()
@@ -170,7 +186,15 @@ def trainEikonal(num_iters, fun, grid_min, grid_max, p=2, device='cpu'):
 
         g_d = grad(f_d, x)
         g_norm = (g_d.norm(2, dim=1) - 1)**2
-        loss = torch.mean(g_norm)
+        g_constraint = torch.mean(g_norm)
+
+        # Penalize extra zeros
+        extra_constraint = torch.mean(
+            torch.where(
+                torch.abs(fun_d) < 1e-3, torch.zeros_like(f_d),
+                torch.exp(-1e2 * torch.abs(f_d))))
+
+        loss = g_constraint + extra_constraint
 
         #if i%500 == 0:
         #print(loss)

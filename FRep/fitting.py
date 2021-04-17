@@ -20,7 +20,12 @@ def makeLossModel(model, pc):
 
 # Wrapper class for fitting FRep models
 class Model(nn.Module):
-    def __init__(self, frep_model, lower_bound, upper_bound, param_init=[], device='cpu'):
+    def __init__(self,
+                 frep_model,
+                 lower_bound,
+                 upper_bound,
+                 param_init=[],
+                 device='cpu'):
         super(Model, self).__init__()
 
         self._frep_model = frep_model
@@ -31,23 +36,35 @@ class Model(nn.Module):
         self.param = []
 
         for i in range(n):
-            if (len(param_init)==0):
+            if (len(param_init) == 0):
                 xmin = lower_bound[i]
                 xmax = upper_bound[i]
-                param = torch.nn.Parameter(torch.FloatTensor(1, 1).uniform_(xmin, xmax).to(device))
+                param = torch.nn.Parameter(
+                    torch.FloatTensor(1, 1).uniform_(xmin, xmax).to(device))
             else:
                 parami = torch.FloatTensor([[param_init[i]]]).to(device)
                 param = torch.nn.Parameter(parami)
             self.param.append(param)
-            self.register_parameter('param'+str(i), param)
+            self.register_parameter('param' + str(i), param)
 
     def __call__(self, x):
         return self._frep_model(x, self.param)
 
 
 # Fit parameters by sgd
-def train(frep_model, lower_bound, upper_bound, point_cloud, param_init=[], num_iters=100, batch_size=1024, device='cpu'):
-    model = Model(frep_model, lower_bound, upper_bound, param_init=param_init, device=device)
+def train(frep_model,
+          lower_bound,
+          upper_bound,
+          point_cloud,
+          param_init=[],
+          num_iters=100,
+          batch_size=1024,
+          device='cpu'):
+    model = Model(frep_model,
+                  lower_bound,
+                  upper_bound,
+                  param_init=param_init,
+                  device=device)
     optimizer = torch.optim.Adam(model.parameters(), lr=0.0001)
 
     if (not torch.is_tensor(point_cloud)):
@@ -56,19 +73,21 @@ def train(frep_model, lower_bound, upper_bound, point_cloud, param_init=[], num_
         point_cloud = point_cloud.to(device)
 
     for i in range(0, num_iters):
-        batches = torch.utils.data.DataLoader(point_cloud, batch_size=batch_size, shuffle=True)
+        batches = torch.utils.data.DataLoader(point_cloud,
+                                              batch_size=batch_size,
+                                              shuffle=True)
 
         for batch in batches:
             model.train()
             optimizer.zero_grad()
-            point_batch = batch[:,0:3]
+            point_batch = batch[:, 0:3]
             f = model(point_batch)
             loss = torch.mean(f**2)
             loss.backward()
             optimizer.step()
 
         #print('iter ' + str(i) + ': ' + str(loss))
-            
+
     model.eval()
 
     parameters = []
@@ -76,4 +95,3 @@ def train(frep_model, lower_bound, upper_bound, point_cloud, param_init=[], num_
         parameters.append(param.detach().cpu().numpy())
 
     return parameters
-

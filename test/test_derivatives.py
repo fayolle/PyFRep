@@ -1,5 +1,6 @@
 import sys
 import os
+
 sys.path.append(os.path.join(os.path.dirname(__file__), "../"))
 
 import torch
@@ -8,10 +9,9 @@ import FRep
 from FRep.primitives import sphere
 from FRep.diff import grad
 
-
-x = torch.tensor([[1.0,0.0,0.0]])
+x = torch.tensor([[1.0, 0.0, 0.0]])
 x.requires_grad = False
-center = torch.tensor([0.0,0.0,0.0])
+center = torch.tensor([0.0, 0.0, 0.0])
 center.requires_grad = False
 r = torch.tensor(1.0)
 r.requires_grad = True

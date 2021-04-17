@@ -4,6 +4,7 @@ Replication of cells using the sawtooth function.
 
 import sys
 import os
+
 sys.path.append(os.path.join(os.path.dirname(__file__), "../"))
 
 import FRep
@@ -11,21 +12,20 @@ from FRep.primitives import *
 from FRep.ops import *
 from FRep.mesh import *
 
-
 import polyscope as ps
 
 
 def model(p):
-    x0 = p[:,0]
-    x1 = p[:,1]
-    x2 = p[:,2]
-    sp = 1.0 - (x0/10.0)**2 - (x1/10.0)**2 - (x2/10.0)**2
+    x0 = p[:, 0]
+    x1 = p[:, 1]
+    x2 = p[:, 2]
+    sp = 1.0 - (x0 / 10.0)**2 - (x1 / 10.0)**2 - (x2 / 10.0)**2
     norsp = sp
     offset = 0.15
     offsp = norsp - offset
     sp_shell = difference(sp, offsp)
     t1 = norsp
-    scale = 9.0 * (1.0-t1) + 3.0 * t1
+    scale = 9.0 * (1.0 - t1) + 3.0 * t1
     xt = x0 * scale
     yt = x1 * scale
     zt = x2 * scale
@@ -42,7 +42,10 @@ def model(p):
 
 
 print('Generating simple model')
-v,f,n = evalToMesh(model, grid_min=(-11.0,-11.0,-11.0), grid_max=(11.0,11.0,11.0), grid_res=(64,64,64))
+v, f, n = evalToMesh(model,
+                     grid_min=(-11.0, -11.0, -11.0),
+                     grid_max=(11.0, 11.0, 11.0),
+                     grid_res=(64, 64, 64))
 print('Done')
 
 ps.init()

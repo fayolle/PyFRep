@@ -7,16 +7,18 @@ from .utils import _normalize, _dot, _vec
 def sphere(p, center, r):
     if not torch.is_tensor(center):
         center = torch.tensor(center)
-    return r - _length(p-center)
+    return r - _length(p - center)
+
 
 def plane(p, normal=(0.0, 0.0, 1.0), point=(0.0, 0.0, 0.0)):
     if not torch.is_tensor(normal):
         normal = torch.tensor(normal)
     if not torch.is_tensor(point):
         point = torch.tensor(point)
-    
+
     normal = _normalize(normal)
     return -torch.dot(point - p, normal)
+
 
 def box(p, b):
     if not torch.is_tensor(b):
@@ -27,11 +29,12 @@ def box(p, b):
 
     t21 = torch.amax(q, axis=1)
     t22 = torch.zeros_like(t21)
-    
+
     t2 = _min(t21, t22)
-    
+
     return -(t1 + t2)
     #return -(_length(_max(q, z)) + _min(torch.amax(q, axis=1), z))
+
 
 def roundedBox(p, b, radius):
     if not torch.is_tensor(b):
@@ -47,11 +50,13 @@ def roundedBox(p, b, radius):
     return -(t1 + t2 - radius)
     #return -(_length(_max(q, z)) + _min(torch.amax(q, axis=1), z) - radius)
 
+
 def torus(p, r1, r2):
-    xy = p[:,[0,1]]
-    z = p[:,2]
+    xy = p[:, [0, 1]]
+    z = p[:, 2]
     a = _length(xy) - r1
     return r2 - _length(_vec(a, z))
+
 
 def capsule(p, a, b, radius):
     if not torch.is_tensor(a):
@@ -60,23 +65,28 @@ def capsule(p, a, b, radius):
         b = torch.tensor(b)
     pa = p - a
     ba = b - a
-    h = torch.clip(torch.dot(pa, ba) / torch.dot(ba, ba), 0.0, 1.0).reshape((-1, 1))
+    h = torch.clip(torch.dot(pa, ba) / torch.dot(ba, ba), 0.0, 1.0).reshape(
+        (-1, 1))
     return radius - _length(pa - torch.multiply(ba, h))
+
 
 def cylinderX(p, center, r):
     if not torch.is_tensor(center):
         center = torch.tensor(center)
-    return r - _length(p[:,[1,2]] - center[[1,2]])
+    return r - _length(p[:, [1, 2]] - center[[1, 2]])
+
 
 def cylinderY(p, center, r):
     if not torch.is_tensor(center):
         center = torch.tensor(center)
-    return r - _length(p[:,[0,2]] - center[[0,2]])
+    return r - _length(p[:, [0, 2]] - center[[0, 2]])
+
 
 def cylinderZ(p, center, r):
     if not torch.is_tensor(center):
         center = torch.tensor(center)
-    return r - _length(p[:,[0,1]] - center[[0,1]])
+    return r - _length(p[:, [0, 1]] - center[[0, 1]])
+
 
 def cappedCylinder(p, a, b, radius):
     if not torch.is_tensor(a):
@@ -93,8 +103,11 @@ def cappedCylinder(p, a, b, radius):
     y = y.reshape((-1, 1))
     x2 = x * x
     y2 = y * y * baba
-    d = torch.where(_max(x, y) < 0,-_min(x2, y2),torch.where(x > 0, x2, 0) + torch.where(y > 0, y2, 0))
+    d = torch.where(
+        _max(x, y) < 0, -_min(x2, y2),
+        torch.where(x > 0, x2, 0) + torch.where(y > 0, y2, 0))
     return -torch.sign(d) * torch.sqrt(torch.abs(d)) / baba
+
 
 def cappedCone(p, a, b, ra, rb):
     if not torch.is_tensor(a):
@@ -113,16 +126,19 @@ def cappedCone(p, a, b, ra, rb):
     cbx = x - ra - f * rba
     cby = paba - f
     s = torch.where(torch.logical_and(cbx < 0, cay < 0), -1, 1)
-    return -s * torch.sqrt(_min(cax * cax + cay * cay * baba,cbx * cbx + cby * cby * baba))
+    return -s * torch.sqrt(
+        _min(cax * cax + cay * cay * baba, cbx * cbx + cby * cby * baba))
+
 
 # Primitives from the HF library
 def block(x, vertex, dx, dy, dz):
     if not torch.is_tensor(vertex):
         vertex = torch.tensor(vertex)
-    b = torch.tensor((dx,dy,dz))
-    shift = vertex + 0.5*b
+    b = torch.tensor((dx, dy, dz))
+    shift = vertex + 0.5 * b
     xt = x - shift
     return box(xt, b)
+
 
 def coneX(x, center, r):
     if torch.is_tensor(r):
@@ -133,11 +149,12 @@ def coneX(x, center, r):
         t = math.atan(r)
         ct = math.cos(t)
         st = math.sin(t)
-    xt = x[:,0] - center[0]
-    yt = x[:,1] - center[1]
-    zt = x[:,2] - center[2]
-    dist = torch.sqrt(zt*zt+yt*yt)*ct - torch.abs(xt)*st
+    xt = x[:, 0] - center[0]
+    yt = x[:, 1] - center[1]
+    zt = x[:, 2] - center[2]
+    dist = torch.sqrt(zt * zt + yt * yt) * ct - torch.abs(xt) * st
     return -dist
+
 
 def coneY(x, center, r):
     if torch.is_tensor(r):
@@ -148,11 +165,12 @@ def coneY(x, center, r):
         t = math.atan(r)
         ct = math.cos(t)
         st = math.sin(t)
-    xt = x[:,0] - center[0]
-    yt = x[:,1] - center[1]
-    zt = x[:,2] - center[2]
-    dist = torch.sqrt(zt*zt+xt*xt)*ct - torch.abs(yt)*st
+    xt = x[:, 0] - center[0]
+    yt = x[:, 1] - center[1]
+    zt = x[:, 2] - center[2]
+    dist = torch.sqrt(zt * zt + xt * xt) * ct - torch.abs(yt) * st
     return -dist
+
 
 def coneZ(x, center, r):
     if torch.is_tensor(r):
@@ -163,11 +181,12 @@ def coneZ(x, center, r):
         t = math.atan(r)
         ct = math.cos(t)
         st = math.sin(t)
-    xt = x[:,0] - center[0]
-    yt = x[:,1] - center[1]
-    zt = x[:,2] - center[2]
-    dist = torch.sqrt(xt*xt+yt*yt)*ct - torch.abs(zt)*st
+    xt = x[:, 0] - center[0]
+    yt = x[:, 1] - center[1]
+    zt = x[:, 2] - center[2]
+    dist = torch.sqrt(xt * xt + yt * yt) * ct - torch.abs(zt) * st
     return -dist
+
 
 # General cylinder
 # Pass through point 'center' in direction 'u' with radius 'r'
@@ -176,7 +195,7 @@ def cylinder(x, center, u, r):
         center = torch.tensor(center)
     if not torch.is_tensor(u):
         u = torch.tensor(u)
-    
+
     cu = center + u
     cmx = center - x
 
@@ -185,44 +204,47 @@ def cylinder(x, center, u, r):
     ub[:] = u
     cp = torch.cross(ub, cmx)
 
-    d1 = cp[:,0]**2 + cp[:,1]**2 + cp[:,2]**2
+    d1 = cp[:, 0]**2 + cp[:, 1]**2 + cp[:, 2]**2
     d2 = u[0]**2 + u[0]**2 + u[2]**2
 
-    d = d1/d2
+    d = d1 / d2
     d = torch.sqrt(d)
 
     f = r - d
     return f
+
 
 def torusX(x, center, R, r0):
     if not torch.is_tensor(center):
         center = torch.tensor(center)
 
     x2 = x - center
-    dyz = torch.sqrt(x2[:,1]**2 + x2[:,2]**2)
+    dyz = torch.sqrt(x2[:, 1]**2 + x2[:, 2]**2)
     dyz = dyz - R
-    dyzx = torch.sqrt(dyz**2 + x2[:,0]**2)
+    dyzx = torch.sqrt(dyz**2 + x2[:, 0]**2)
     dyzx = dyzx - r0
     return (-dyzx)
+
 
 def torusY(x, center, R, r0):
     if not torch.is_tensor(center):
         center = torch.tensor(center)
 
     x2 = x - center
-    dxz = torch.sqrt(x2[:,0]**2 + x2[:,2]**2)
+    dxz = torch.sqrt(x2[:, 0]**2 + x2[:, 2]**2)
     dxz = dxz - R
-    dxzy = torch.sqrt(dxz**2 + x2[:,1]**2)
+    dxzy = torch.sqrt(dxz**2 + x2[:, 1]**2)
     dxzy = dxzy - r0
     return (-dxzy)
+
 
 def torusZ(x, center, R, r0):
     if not torch.is_tensor(center):
         center = torch.tensor(center)
 
     x2 = x - center
-    dxy = torch.sqrt(x2[:,0]**2 + x2[:,1]**2)
+    dxy = torch.sqrt(x2[:, 0]**2 + x2[:, 1]**2)
     dxy = dxy - R
-    dxyz = torch.sqrt(dxy**2 + x2[:,2]**2)
+    dxyz = torch.sqrt(dxy**2 + x2[:, 2]**2)
     dxyz = dxyz - r0
     return (-dxyz)

@@ -4,8 +4,11 @@ import torch.autograd as autograd
 
 # Given y = f(x), compute grad(f)(x)
 def grad(y, x):
-    g = autograd.grad(y, [x], grad_outputs=torch.ones_like(y), create_graph=True)[0]
+    g = autograd.grad(y, [x],
+                      grad_outputs=torch.ones_like(y),
+                      create_graph=True)[0]
     return g
+
 
 # Given a function f, and a variable x,
 # compute y = f(x) and g = grad(f)(x).
@@ -18,23 +21,29 @@ def fun_grad(f, x):
     g = grad(y, x)
     return (y, g)
 
+
 # Given a vector field y = v(x), compute div y
 def div(y, x):
     div = 0.0
     for i in range(y.shape[-1]):
-        div += autograd.grad(y[..., i], x, grad_outputs=torch.ones_like(y[..., i]), create_graph=True)[0][..., i:i+1]
+        div += autograd.grad(y[..., i],
+                             x,
+                             grad_outputs=torch.ones_like(y[..., i]),
+                             create_graph=True)[0][..., i:i + 1]
     return div
+
 
 def Laplacian(y, x):
     g = grad(y, x)
     return div(g, x)
 
+
 def pLaplacian(y, x, p=2):
     g = grad(y, x)
     #g_n = g.norm(2, dim=1)
     g_n = torch.linalg.norm(g, 2, dim=1)
-    g_n = g_n**(p-2)
-    g_n = torch.reshape(g_n, (g.shape[0],1))
+    g_n = g_n**(p - 2)
+    g_n = torch.reshape(g_n, (g.shape[0], 1))
     g = g_n * g
     return div(g, x)
 

@@ -4,6 +4,7 @@ Replication of cells using the sawtooth function.
 
 import sys
 import os
+
 sys.path.append(os.path.join(os.path.dirname(__file__), "../"))
 
 import FRep
@@ -16,16 +17,20 @@ import polyscope as ps
 
 def replicant(p):
     q = sawtooth(p, 5.0)
-    torus1 = torusZ(q, (-1.0,1.0,0.0), 1.0, 0.1)
-    torus2 = torusX(q, (0.0,-1.0,-1.0), 1.0, 0.1)
-    torus3 = torusY(q, (1.0,0.0,1.0), 1.0, 0.1)
-    sp4 = sphere(q, (0.0,0.0,0.0), 0.8)
+    torus1 = torusZ(q, (-1.0, 1.0, 0.0), 1.0, 0.1)
+    torus2 = torusX(q, (0.0, -1.0, -1.0), 1.0, 0.1)
+    torus3 = torusY(q, (1.0, 0.0, 1.0), 1.0, 0.1)
+    sp4 = sphere(q, (0.0, 0.0, 0.0), 0.8)
     res5 = boundBlendUnion(torus1, torus2, sp4, 0.08, 1.0, 1.0, 1.0)
     res6 = boundBlendUnion(res5, torus3, sp4, 0.08, 1.0, 1.0, 1.0)
     return res6
 
+
 print('Generating simple model')
-v,f,n = evalToMesh(replicant, grid_min=(-10.0,-10.0,-10.0), grid_max=(10.0,10.0,10.0), grid_res=(64,64,64))
+v, f, n = evalToMesh(replicant,
+                     grid_min=(-10.0, -10.0, -10.0),
+                     grid_max=(10.0, 10.0, 10.0),
+                     grid_res=(64, 64, 64))
 print('Done')
 
 ps.init()

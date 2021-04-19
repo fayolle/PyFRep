@@ -380,3 +380,528 @@ def convCurve(p, vect, S, T):
                 torch.atan(S[n] * (l - xx) / p)) / (2.0 * S[n] * p * p * p)
 
     return f - T
+
+def ConvLineR (p, begin, end, S, R):
+    '''
+    Primitive: Cauchy Line with Convolution Surface
+    Definition:  1 / (1 + S^2*R^2)^2
+                 R is the distance between primitive and x
+    Parameters:
+                 p - points coordinate array
+                 begin - beginning points coordinate array
+                 end - ending points coordinate array
+                 S - control value for width of the kernel
+                 R - width of primitive
+    '''
+
+    # the number of primitive
+    N = len(end)
+    N = int(N/3)
+
+
+    if not torch.is_tensor(begin):
+        begin = torch.tensor(begin)
+
+    if not torch.is_tensor(end):
+        end = torch.tensor(end)
+
+    if not torch.is_tensor(S):
+        S = torch.tensor(S)
+
+    if not torch.is_tensor(R):
+        R = torch.tensor(R)
+
+
+    X = p[:, 0]
+    Y = p[:, 1]
+    Z = p[:, 2]
+
+    f = 0.0
+
+    if R < 1:
+        S = 1 / R
+
+    for n in range(0, N):
+        l = torch.sqrt((end[3 * n] - begin[3 * n]) ** 2 +
+                       (end[3 * n + 1] - begin[3 * n + 1]) ** 2 +
+                       (end[3 * n + 2] - begin[3 * n + 2]) ** 2)
+
+        if l == 0.0:
+            return 0
+
+        # normalized vector from beginnig to ending  Point
+        ax = (end[3 * n] - begin[3 * n]) / l
+        ay = (end[3 * n + 1] - begin[3 * n + 1]) / l
+        az = (end[3 * n + 2] - begin[3 * n + 2]) / l
+        # d = r - b
+        dx = X - begin[3 * n]
+        dy = Y - begin[3 * n + 1]
+        dz = Z - begin[3 * n + 2]
+
+
+        pT = torch.sqrt(1 + (S**2) * (R**2))
+        qT2 = 1 + (S**2) * ((R**2) + (l**2))
+
+        T = l / (2.0 * (pT**2) * qT2) + (torch.atan(S * l / pT)) / (2.0 * S * (pT**2) * pT)
+        xx = dx * ax + dy * ay + dz * az
+        p = torch.sqrt(1 + (S**2) * ((dx**2) + (dy**2) + (dz**2) - (xx**2)))
+        q2 = 1 + (S**2) * ((dx**2) + (dy**2) + (dz**2) + (l**2) - 2.0 * l * xx)
+
+        f_tmp = xx / (2.0 * p * p * (p * p + S * S * xx * xx)) + (l - xx) / (2.0 * p * p * q2) + \
+                (torch.atan(S * xx / p) + torch.atan(S * (l - xx) / p)) / (2.0 * S * p * p * p)
+
+        #  f < 1.0:
+
+        if not torch.is_tensor(f):
+            f = torch.tensor(f)
+
+        if torch.lt(f,1.0).all():
+            f = f + f_tmp
+            if torch.gt(f,1.0).all():
+                f = 1.0
+
+
+
+    return f - T
+
+
+def ConvTriangle(p, vect, S, T):
+    '''
+       Primitive: Cauchy Triangle with Convolution Surface
+       Definition:  1 / (1 + S^2*R^2)^2
+                    R is the distance between primitive and x
+       Parameters:
+                    p - points coordinate array
+                    vect - triangle coordinate array
+                    S - control value for width of the kernel
+                    T - threshold value
+       '''
+
+
+    length = [0,0,0];   # length[0]  means distance of coordinate 1 and 2
+                        # length[1] means distance of coordinate 2 and 3
+                        # length[2] means distance of coordinate 3 and 1
+
+    if not torch.is_tensor(vect):
+        vect = torch.tensor(vect)
+
+    X = p[:, 0]
+    Y = p[:, 1]
+    Z = p[:, 2]
+
+    f = 0.0
+
+    # the number of primitive
+    N = len(S)
+    for n in range(0, N):
+        a1x = vect[9 * n]
+        a1y = vect[9 * n + 1]
+        a1z = vect[9 * n + 2]
+        a2x = vect[9 * n + 3]
+        a2y = vect[9 * n + 4]
+        a2z = vect[9 * n + 5]
+        a3x = vect[9 * n + 6]
+        a3y = vect[9 * n + 7]
+        a3z = vect[9 * n + 8]
+
+        length[0] = torch.sqrt((a2x - a1x)**2 + (a2y - a1y)**2 + (a2z - a1z)**2)
+        length[1] = torch.sqrt((a3x - a2x)**2 + (a3y - a2y)**2 + (a3z - a2z)**2)
+        length[2] = torch.sqrt((a1x - a3x)**2 + (a1y - a3y)**2 + (a1z - a3z)**2)
+
+        if (length[1] >= length[2]) and (length[1] > length[0]):
+            tempx = a1x
+            tempy = a1y
+            tempz = a1z
+            a1x = a2x
+            a1y = a2y
+            a1z = a2z
+            a2x = a3x
+            a2y = a3y
+            a2z = a3z
+            a3x = tempx
+            a3y = tempy
+            a3z = tempz
+        elif (length[2] >= length[1]) and (length[2] > length[0]):
+            tempx = a1x
+            tempy = a1y
+            tempz = a1z
+            a1x = a3x
+            a1y = a3y
+            a1z = a3z
+            a3x = a2x
+            a3y = a2y
+            a3z = a2z
+            a2x = tempx
+            a2y = tempy
+            a2z = tempz
+
+        length[0] = torch.sqrt((a2x - a1x) ** 2 + (a2y - a1y) ** 2 + (a2z - a1z) ** 2)
+        length[1] = torch.sqrt((a3x - a2x) ** 2 + (a3y - a2y) ** 2 + (a3z - a2z) ** 2)
+        length[2] = torch.sqrt((a1x - a3x) ** 2 + (a1y - a3y) ** 2 + (a1z - a3z) ** 2)
+
+        a21x = a2x - a1x
+        a21y = a2y - a1y
+        a21z = a2z - a1z
+        a13x = a1x - a3x
+        a13y = a1y - a3y
+        a13z = a1z - a3z
+
+        t = -(a21x * a13x + a21y * a13y + a21z * a13z) / (length[0])**2;
+        bx = a1x + t * a21x
+        by = a1y + t * a21y
+        bz = a1z + t * a21z
+
+        dx = X - bx
+        dy = Y - by
+        dz = Z - bz
+
+        ux = a2x - bx
+        uy = a2y - by
+        uz = a2z - bz
+        ul = torch.sqrt((ux)**2 + (uy)**2 + (uz)**2)
+        ux = ux / ul
+        uy = uy / ul
+        uz = uz / ul
+
+        vx = a3x - bx
+        vy = a3y - by
+        vz = a3z - bz
+        vl = torch.sqrt((vx)**2 + (vy)**2 + (vz)**2)
+        vx = vx / vl
+        vy = vy / vl
+        vz = vz / vl
+
+        d2 = (dx)**2 + (dy)**2 + (dz)**2
+        u = dx * ux + dy * uy + dz * uz
+        v = dx * vx + dy * vy + dz * vz
+        h = torch.sqrt((a3x - bx)**2 + (a3y - by)**2 + (a3z - bz)**2)
+        a1 = torch.sqrt((a1x - bx)**2 + (a1y - by)**2 + (a1z - bz)**2)
+        a2 = torch.sqrt((a2x - bx)**2 + (a2y - by)**2 + (a2z - bz)**2)
+
+        g = v - h
+        m = a2 * g + u * h
+        k = u * h - a1 * g
+        C2 = 1.0 / ((S[n]**2)) + d2 - (u)**2
+        C = torch.sqrt(C2)
+        q = C2 - (v)**2
+        w = C2 - 2.0 * v * h + (h)**2
+        A2 = ((a1)**2) * w + ((h)**2) * (q + (u)**2) - 2.0 * a1 * h * u * g
+        A = torch.sqrt(A2)
+        B2 = ((a2)**2) * w + ((h)**2) * (q + (u)**2) + 2.0 * a2 * h * u * g
+        B = torch.sqrt(B2)
+
+        n1 = a1 + u
+        n2 = a2 - u
+        n3 = a1 * n1 + v * h
+        n4 = -a1 * u - g * h
+        n5 = -a2 * n2 - v * h
+        n6 = -a2 * u + g * h
+
+        arc1 = k * (torch.atan(n3 / A) + torch.atan(n4 / A)) / A
+        arc2 = m * (torch.atan(n5 / B) + torch.atan(n6 / B)) / B
+        arc3 = v * (torch.atan(n1 / C) + torch.atan(n2 / C)) / C
+        f += (arc1 + arc2 + arc3) / (2.0 * q * S[n])
+
+
+    return f - T
+
+def ConvMesh(p, vect, tri, S, T):
+    '''
+       Primitive: Cauchy Mesh (connected triangle) with Convolution Surface
+       Definition:  1 / (1 + S^2*R^2)^2
+                    R is the distance between primitive and x
+       Parameters:
+                    p - points coordinate array
+                    vect - triangle coordinate array
+                    tri - index of each triangle coordinate
+                    S - control value for width of the kernel
+                    T - threshold value
+    '''
+
+
+    length = [0,0,0];   # length[0]  means distance of coordinate 1 and 2
+                        # length[1] means distance of coordinate 2 and 3
+                        # length[2] means distance of coordinate 3 and 1
+
+    if not torch.is_tensor(vect):
+        vect = torch.tensor(vect)
+
+    X = p[:, 0]
+    Y = p[:, 1]
+    Z = p[:, 2]
+
+    f = 0.0
+
+    # the number of primitive
+    N = len(S)
+    for n in range(0, N):
+        #triangle coodinates
+        a1x = vect[3 * (tri[3 * n]-1)]
+        a1y = vect[3 * (tri[3 * n]-1) + 1]
+        a1z = vect[3 * (tri[3 * n]-1) + 2]
+        a2x = vect[3 * (tri[3 * n+1]-1)]
+        a2y = vect[3 * (tri[3 * n+1]-1) + 1]
+        a2z = vect[3 * (tri[3 * n+1]-1) + 2]
+        a3x = vect[3 * (tri[3 * n+2]-1)]
+        a3y = vect[3 * (tri[3 * n+2]-1) + 1]
+        a3z = vect[3 * (tri[3 * n+2]-1) + 2]
+
+        length[0] = torch.sqrt((a2x - a1x)**2 + (a2y - a1y)**2 + (a2z - a1z)**2)
+        length[1] = torch.sqrt((a3x - a2x)**2 + (a3y - a2y)**2 + (a3z - a2z)**2)
+        length[2] = torch.sqrt((a1x - a3x)**2 + (a1y - a3y)**2 + (a1z - a3z)**2)
+
+        if (length[1] >= length[2]) and (length[1] > length[0]):
+            tempx = a1x
+            tempy = a1y
+            tempz = a1z
+            a1x = a2x
+            a1y = a2y
+            a1z = a2z
+            a2x = a3x
+            a2y = a3y
+            a2z = a3z
+            a3x = tempx
+            a3y = tempy
+            a3z = tempz
+        elif (length[2] >= length[1]) and (length[2] > length[0]):
+            tempx = a1x
+            tempy = a1y
+            tempz = a1z
+            a1x = a3x
+            a1y = a3y
+            a1z = a3z
+            a3x = a2x
+            a3y = a2y
+            a3z = a2z
+            a2x = tempx
+            a2y = tempy
+            a2z = tempz
+
+        length[0] = torch.sqrt((a2x - a1x) ** 2 + (a2y - a1y) ** 2 + (a2z - a1z) ** 2)
+        length[1] = torch.sqrt((a3x - a2x) ** 2 + (a3y - a2y) ** 2 + (a3z - a2z) ** 2)
+        length[2] = torch.sqrt((a1x - a3x) ** 2 + (a1y - a3y) ** 2 + (a1z - a3z) ** 2)
+
+        a21x = a2x - a1x
+        a21y = a2y - a1y
+        a21z = a2z - a1z
+        a13x = a1x - a3x
+        a13y = a1y - a3y
+        a13z = a1z - a3z
+
+        t = -(a21x * a13x + a21y * a13y + a21z * a13z) / (length[0])**2;
+        bx = a1x + t * a21x
+        by = a1y + t * a21y
+        bz = a1z + t * a21z
+
+        dx = X - bx
+        dy = Y - by
+        dz = Z - bz
+
+        ux = a2x - bx
+        uy = a2y - by
+        uz = a2z - bz
+        ul = torch.sqrt((ux)**2 + (uy)**2 + (uz)**2)
+        ux = ux / ul
+        uy = uy / ul
+        uz = uz / ul
+
+        vx = a3x - bx
+        vy = a3y - by
+        vz = a3z - bz
+        vl = torch.sqrt((vx)**2 + (vy)**2 + (vz)**2)
+        vx = vx / vl
+        vy = vy / vl
+        vz = vz / vl
+
+        d2 = (dx)**2 + (dy)**2 + (dz)**2
+        u = dx * ux + dy * uy + dz * uz
+        v = dx * vx + dy * vy + dz * vz
+        h = torch.sqrt((a3x - bx)**2 + (a3y - by)**2 + (a3z - bz)**2)
+        a1 = torch.sqrt((a1x - bx)**2 + (a1y - by)**2 + (a1z - bz)**2)
+        a2 = torch.sqrt((a2x - bx)**2 + (a2y - by)**2 + (a2z - bz)**2)
+
+        g = v - h
+        m = a2 * g + u * h
+        k = u * h - a1 * g
+        C2 = 1.0 / ((S[n]**2)) + d2 - (u)**2
+        C = torch.sqrt(C2)
+        q = C2 - (v)**2
+        w = C2 - 2.0 * v * h + (h)**2
+        A2 = ((a1)**2) * w + ((h)**2) * (q + (u)**2) - 2.0 * a1 * h * u * g
+        A = torch.sqrt(A2)
+        B2 = ((a2)**2) * w + ((h)**2) * (q + (u)**2) + 2.0 * a2 * h * u * g
+        B = torch.sqrt(B2)
+
+        n1 = a1 + u
+        n2 = a2 - u
+        n3 = a1 * n1 + v * h
+        n4 = -a1 * u - g * h
+        n5 = -a2 * n2 - v * h
+        n6 = -a2 * u + g * h
+
+        arc1 = k * (torch.atan(n3 / A) + torch.atan(n4 / A)) / A
+        arc2 = m * (torch.atan(n5 / B) + torch.atan(n6 / B)) / B
+        arc3 = v * (torch.atan(n1 / C) + torch.atan(n2 / C)) / C
+        f += (arc1 + arc2 + arc3) / (2.0 * q * S[n])
+
+
+    return f - T
+
+
+def ConvArc(p, angle, axis,theta,radius,center, S, T):
+    '''
+           Primitive: Convolution with set of skeleton arcs
+           Definition:  1 / (1 + S^2*R^2)^2
+                        R is the distance between primitive and x
+           Parameters:
+                        p - points coordinate array
+                        angle - angles of rotation for arcs around axis of rotation
+                        axis - array of vectors defining axis of rotation for each arc (placed on local xy-plane)
+                        theta -  array of arcs' angles (from positive x-axis counter-clockwise, 360 for full circle)
+                        radius - arc radius
+                        center - center of arc
+                        S - control value for width of the kernel
+                        T - threshold value
+    '''
+
+    if not torch.is_tensor(angle):
+        angle = torch.tensor(angle)
+    if not torch.is_tensor(theta):
+        theta = torch.tensor(theta)
+
+    PI = 3.141592
+    rd = PI / 180.0
+    over_i = 0.0; over_j = 0.0; over_k = 1.0;
+
+    EPS = 0.01
+
+    X = p[:, 0]
+    Y = p[:, 1]
+    Z = p[:, 2]
+
+    f = 0.0
+
+    # the number of primitive
+    N = len(S)
+    for n in range(0, N):
+        cx = center[3 * n] #Center of Arc
+        cy = center[3 * n + 1]
+        cz = center[3 * n + 2]
+
+        r = radius[n]
+        angle[n] += EPS; #avoid error
+
+        i = axis[3 * n] + EPS;  #avoid error
+        j = axis[3 * n + 1] + EPS;  #avoid error
+        k = axis[3 * n + 2] + EPS;  #avoid error
+
+        if not torch.is_tensor(i):
+            i = torch.tensor(i)
+        if not torch.is_tensor(j):
+            j = torch.tensor(j)
+        if not torch.is_tensor(k):
+            k = torch.tensor(k)
+
+        length = torch.sqrt(i * i + j * j + k * k);
+        if length < EPS:
+            length = EPS;
+
+        i /= length;  #Calculate normal vector around which Arc rotates
+        j /= length;
+        k /= length;
+
+        c = torch.cos(rd * (-1*angle[n]));
+        s = torch.sin(rd * (-1*angle[n]));
+
+        one_c = 1.0 - c;
+
+        ii = i * i;
+        jj = j * j;
+        kk = k * k;
+        ij = i * j;
+        jk = j * k;
+        ki = k * i;
+        is_ = i * s;
+        js = j * s;
+        ks = k * s;
+
+        if theta[n] > 360.0:
+          theta[n] = 360.0;
+
+        #[Begin] over PI operation
+        if theta[n] > 180.0:
+            over_th = (theta[n] - 180.0) * rd;
+            theta[n] = 180.0;
+
+            #rotate by - angle
+            tempx = (c + ii * one_c) * (X - cx) + (-ks + ij * one_c) * (Y - cy) + (js + ki * one_c) * (Z - cz);
+            tempy = (ks + ij * one_c) * (X - cx) + (c + jj * one_c) * (Y - cy) + (-is_ + jk * one_c) * (Z - cz);
+            tempz = (-js + ki * one_c) * (X - cx) + (is_ + jk * one_c) * (Y - cy) + (c + kk * one_c) * (Z - cz);
+
+            #[Begin] rotate -PI operation
+            over_c = torch.cos(rd * (-180.0));
+            over_s = torch.sin(rd * (-180.0));
+            over_one_c = 1.0 - over_c;
+
+            over_ii = (over_i)**2;
+            over_jj = (over_j)**2;
+            over_kk = (over_k)**2;
+            over_ij = over_i * over_j;
+            over_jk = over_j * over_k;
+            over_ki = over_k * over_i;
+            over_is = over_i * over_s;
+            over_js = over_j * over_s;
+            over_ks = over_k * over_s;
+
+            over_x = (over_c + over_ii * over_one_c) * (tempx) + (-over_ks + over_ij * over_one_c) * (tempy) + (over_js + over_ki * over_one_c) * (tempz);
+            over_y = (over_ks + over_ij * over_one_c) * (tempx) + (over_c + over_jj * over_one_c) * (tempy) + (-1*over_is + over_jk * over_one_c) * (tempz);
+            over_z = (-1*over_js + over_ki * over_one_c) * (tempx) + (over_is + over_jk * over_one_c) * (tempy) + (over_c + over_kk * over_one_c) * (tempz);
+            # [End] rotate -PI operation
+
+            a = 2.0 * r * S[n] * S[n];
+            d2 = (over_x)**2 + (over_y)**2 + (over_z)**2;
+            b = 1.0 + (r)**2 * (S[n])**2 + ((S[n])**2) * d2;
+            p2 = -1*(r)**4 * (S[n])**4 + 2.0 * (r)**2 * (S[n])**2 * ((S[n])**2 * (d2 - 2.0 * (over_z)**2) - 1.0) - (1.0 + (S[n])**2 * d2)**2;
+            if p2 < 0.0:
+                p1 = torch.sqrt(-1*p2)
+            else:
+                p1 = torch.sqrt(p2);
+            p3 = p1 * p2;
+
+            f1 = (b * over_y) / (over_x * p2 * (a * over_x - b)) + (a * ((over_x)**2 +(over_y)**2) * torch.sin(over_th) - b * over_y) / (over_x * p2 * (a * (over_x * torch.cos(over_th) + over_y * torch.sin(over_th)) - b));
+
+            if torch.lt(p2, 0.0).all():
+                f2 = 2.0 * b * (torch.atan(-a * over_y / p1) + torch.atan((a * over_y - (a * over_x + b) * torch.tan(over_th / 2.0)) / p1)) / p3;
+            else:
+                f2 = 2.0 * b * (torch.atanh(a * over_y / p1) + torch.atanh(((a * over_x + b) * torch.tan(over_th / 2.0) - a * over_y) / p1)) / p3;
+
+            f += f1 + f2;
+#-------------
+        th = theta[n] * rd;
+        new_x = (c + ii * one_c) * (X - cx) + (-1*ks + ij * one_c) * (Y - cy) + (js + ki * one_c) * (Z - cz);
+        new_y = (ks + ij * one_c) * (X - cx) + (c + jj * one_c) * (Y - cy) + (-1*is_ + jk * one_c) * (Z - cz);
+        new_z = (-1*js + ki * one_c) * (X - cx) + (is_ + jk * one_c) * (Y - cy) + (c + kk * one_c) * (Z - cz);
+
+        a = 2.0 * r * S[n] * S[n];
+        d2 = (new_x)**2 + (new_y)**2 + (new_z)**2;
+        b = 1.0 + (r)**2 * (S[n])**2 + (S[n])**2 * d2;
+        p2 = -1*(r)**4 * (S[n])**4 + 2.0 * (r)**2 * (S[n])**2 * ((S[n])**2 * (d2 - 2.0 * (new_z)**2) - 1.0) - (1.0 + (S[n])**2 * d2)**2;
+        if torch.lt(p2, 0.0).all():
+            p1 =  torch.sqrt(-1*p2)
+        else:
+            p1 = torch.sqrt(p2);
+        p3 = p1 * p2;
+
+        f1 = (b * new_y) / (new_x * p2 * (a * new_x - b)) + (a * ((new_x)**2 + (new_y)**2) * torch.sin(th) - b * new_y) / (new_x * p2 * (a * (new_x * torch.cos(th) + new_y * torch.sin(th)) - b));
+
+        if torch.lt(p2, 0.0).all():
+            f2 = 2.0 * b * (torch.atan(-a * new_y / p1) + torch.atan((a * new_y - (a * new_x + b) * torch.tan(th / 2.0)) / p1)) / p3;
+        else:
+            f2 = 2.0 * b * (torch.atanh(a * new_y / p1) + torch.atanh(((a * new_x + b) * torch.tan(th / 2.0) - a * new_y) / p1)) / p3;
+
+        f += f1 + f2;
+
+
+
+
+    return f - T

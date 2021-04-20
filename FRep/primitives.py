@@ -381,6 +381,7 @@ def convCurve(p, vect, S, T):
 
     return f - T
 
+
 def ConvLineR (p, begin, end, S, R):
     '''
     Primitive: Cauchy Line with Convolution Surface
@@ -396,7 +397,7 @@ def ConvLineR (p, begin, end, S, R):
 
     # the number of primitive
     N = len(end)
-    N = int(N/3)
+    N = int(N/3) # or N//3
 
 
     if not torch.is_tensor(begin):
@@ -405,12 +406,6 @@ def ConvLineR (p, begin, end, S, R):
     if not torch.is_tensor(end):
         end = torch.tensor(end)
 
-    if not torch.is_tensor(S):
-        S = torch.tensor(S)
-
-    if not torch.is_tensor(R):
-        R = torch.tensor(R)
-
 
     X = p[:, 0]
     Y = p[:, 1]
@@ -418,8 +413,8 @@ def ConvLineR (p, begin, end, S, R):
 
     f = 0.0
 
-    if R < 1:
-        S = 1 / R
+    if R < 1.0:
+        S = 1.0 / R
 
     for n in range(0, N):
         l = torch.sqrt((end[3 * n] - begin[3 * n]) ** 2 +
@@ -427,7 +422,7 @@ def ConvLineR (p, begin, end, S, R):
                        (end[3 * n + 2] - begin[3 * n + 2]) ** 2)
 
         if l == 0.0:
-            return 0
+            return 0.0
 
         # normalized vector from beginnig to ending  Point
         ax = (end[3 * n] - begin[3 * n]) / l
@@ -450,8 +445,8 @@ def ConvLineR (p, begin, end, S, R):
         f_tmp = xx / (2.0 * p * p * (p * p + S * S * xx * xx)) + (l - xx) / (2.0 * p * p * q2) + \
                 (torch.atan(S * xx / p) + torch.atan(S * (l - xx) / p)) / (2.0 * S * p * p * p)
 
-        #  f < 1.0:
 
+        #  f < 1.0:
         if not torch.is_tensor(f):
             f = torch.tensor(f)
 
@@ -459,8 +454,6 @@ def ConvLineR (p, begin, end, S, R):
             f = f + f_tmp
             if torch.gt(f,1.0).all():
                 f = 1.0
-
-
 
     return f - T
 

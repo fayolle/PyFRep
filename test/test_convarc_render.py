@@ -25,10 +25,9 @@ def model(p):
 
 
 v, f, n = evalToMesh(model,
-                     grid_min=(-10, -10, -10),
-                     grid_max=(10, 10, 10),
+                     grid_min=(-20, -20, -20),
+                     grid_max=(20, 20, 20),
                      grid_res=(64, 64, 64))
-
 
 ps.init()
 ps.register_surface_mesh("mesh", v, f)

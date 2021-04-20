@@ -772,20 +772,20 @@ def convArc(p, center, radius, theta, axis, angle, S, T):
                  T - threshold value
     '''
 
-    if not torch.is_tensor(angle):
-        angle = torch.tensor(angle)
-
-    if not torch.is_tensor(axis):
-        axis = torch.tensor(axis)
-
-    if not torch.is_tensor(theta):
-        theta = torch.tensor(theta)
+    if not torch.is_tensor(center):
+        center = torch.tensor(center)
 
     if not torch.is_tensor(radius):
         radius = torch.tensor(radius)
 
-    if not torch.is_tensor(center):
-        center = torch.tensor(center)
+    if not torch.is_tensor(theta):
+        theta = torch.tensor(theta)
+
+    if not torch.is_tensor(axis):
+        axis = torch.tensor(axis)
+
+    if not torch.is_tensor(angle):
+        angle = torch.tensor(angle)
 
     if not torch.is_tensor(S):
         S = torch.tensor(S)

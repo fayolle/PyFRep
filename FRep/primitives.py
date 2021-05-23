@@ -234,6 +234,36 @@ def gyroid_sheet(p, alpha, beta, gamma, c1, c2):
     return g1 - g2 - torch.sqrt(g1**2 + g2**2)
 
 
+def lidinoid(p):
+    x = p[:,0]
+    y = p[:,1]
+    z = p[:,2]
+    return (0.5*(torch.sin(2.0*x)*torch.cos(y)*torch.sin(z)
+                 + torch.sin(2.0*y)*torch.cos(z)*torch.sin(x)
+                 + torch.sin(2.0*z)*torch.cos(x)*torch.sin(y))
+            - 0.5*(torch.cos(2.0*x)*torch.cos(2.0*y)
+                   +torch.cos(2.0*y)*torch.cos(2.0*z)
+                   +torch.cos(2.0*z)*torch.cos(2.0*x))
+            + 0.15)
+
+
+def SchwarzP(p):
+    x = p[:,0]
+    y = p[:,1]
+    z = p[:,2]
+    return torch.cos(x) + torch.cos(y) + torch.cos(z)
+
+
+def SchwarzD(p):
+    x = p[:,0]
+    y = p[:,1]
+    z = p[:,2]
+    return (torch.sin(x)*torch.sin(y)*torch.sin(z) +
+            torch.sin(x)*torch.cos(y)*torch.cos(z) +
+            torch.cos(x)*torch.sin(y)*torch.cos(z) +
+            torch.cos(x)*torch.cos(y)*torch.sin(z))
+
+
 def convPoint(p, vect, S, T):
     '''
     p - point coordinates

@@ -9,7 +9,7 @@ The dependencies are:
 - Polyscope
 - Torch
 
-See also the file 'requirements.txt'
+See also the file 'setup.py'
 
 ## Installation 
 Create a Python virtualenv

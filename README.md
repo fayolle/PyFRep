@@ -24,9 +24,9 @@ or OSX/Linux
 ```bash
 ./venv/bin/activate
 ```
-and install the dependencies with pip
+and install
 ```bash
-pip install -r requirements.txt
+pip install -e .
 ```
 
 ## Example 

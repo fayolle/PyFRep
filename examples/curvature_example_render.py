@@ -3,11 +3,6 @@ Example to illustrate computing the mean curvature of an implicit surface
 and rendering it. 
 '''
 
-import sys
-import os
-
-sys.path.append(os.path.join(os.path.dirname(__file__), "../"))
-
 import torch
 
 import FRep

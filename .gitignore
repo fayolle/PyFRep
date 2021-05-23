@@ -5,7 +5,7 @@ env/
 venv/
 __pycache__/
 *.py[cod]
-
+PyFRep.egg-info/
 
 # Emacs 
 *~

@@ -2,11 +2,6 @@
 Replication of cells using the sawtooth function.
 '''
 
-import sys
-import os
-
-sys.path.append(os.path.join(os.path.dirname(__file__), "../"))
-
 import FRep
 from FRep.primitives import *
 from FRep.sdf_primitives import sphere as sdSphere

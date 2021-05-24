@@ -219,7 +219,7 @@ def superEll(p, center, a, b, c, s1, s2):
     return 1.0 - xyp - zp
 
 
-def gyroid(p, alpha, beta, gamma):
+def gyroid(p, alpha=1.0, beta=1.0, gamma=1.0):
     X = 2.0 * alpha * math.pi * p[:, 0]
     Y = 2.0 * beta * math.pi * p[:, 1]
     Z = 2.0 * gamma * math.pi * p[:, 2]
@@ -234,10 +234,10 @@ def gyroidSheet(p, alpha, beta, gamma, c1, c2):
     return g1 - g2 - torch.sqrt(g1**2 + g2**2)
 
 
-def lidinoid(p):
-    x = p[:,0]
-    y = p[:,1]
-    z = p[:,2]
+def lidinoid(p, alpha=1.0, beta=1.0, gamma=1.0):
+    x = 2.0 * alpha * math.pi * p[:,0]
+    y = 2.0 * beta * math.pi * p[:,1]
+    z = 2.0 * gamma * math.pi * p[:,2]
     return (0.5*(torch.sin(2.0*x)*torch.cos(y)*torch.sin(z)
                  + torch.sin(2.0*y)*torch.cos(z)*torch.sin(x)
                  + torch.sin(2.0*z)*torch.cos(x)*torch.sin(y))
@@ -247,17 +247,17 @@ def lidinoid(p):
             + 0.15)
 
 
-def SchwarzP(p):
-    x = p[:,0]
-    y = p[:,1]
-    z = p[:,2]
+def SchwarzP(p, alpha=1.0, beta=1.0, gamma=1.0):
+    x = 2.0 * alpha * math.pi * p[:,0]
+    y = 2.0 * beta * math.pi * p[:,1]
+    z = 2.0 * gamma * math.pi * p[:,2]
     return torch.cos(x) + torch.cos(y) + torch.cos(z)
 
 
-def SchwarzD(p):
-    x = p[:,0]
-    y = p[:,1]
-    z = p[:,2]
+def SchwarzD(p, alpha=1.0, beta=1.0, gamma=1.0):
+    x = 2.0 * alpha * math.pi * p[:,0]
+    y = 2.0 * beta * math.pi * p[:,1]
+    z = 2.0 * gamma * math.pi * p[:,2]
     return (torch.sin(x)*torch.sin(y)*torch.sin(z) +
             torch.sin(x)*torch.cos(y)*torch.cos(z) +
             torch.cos(x)*torch.sin(y)*torch.cos(z) +

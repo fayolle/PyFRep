@@ -1,3 +1,5 @@
+import math
+
 import FRep
 from FRep.primitives import *
 from FRep.ops import *
@@ -8,7 +10,7 @@ import polyscope as ps
 
 def model(p):
     b1 = block(p, vertex=(-4.0, -4.0, -4.0), dx=8.0, dy=8.0, dz=8.0)
-    l2 = SchwarzP(p)
+    l2 = SchwarzP(p, alpha=1.0/(2.0*math.pi), beta=1.0/(2.0*math.pi), gamma=1.0/(2.0*math.pi))
     t3 = intersection(b1, l2)
     return t3
 

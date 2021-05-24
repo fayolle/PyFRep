@@ -19,13 +19,10 @@ def replicant(p):
     res5 = union(res4, torus3)
     return res5
 
-
-print('Generating simple model')
 v, f, n = evalToMesh(replicant,
                      grid_min=(-10.0, -10.0, -10.0),
                      grid_max=(10.0, 10.0, 10.0),
                      grid_res=(64, 64, 64))
-print('Done')
 
 ps.init()
 ps.register_surface_mesh("mesh", v, f)

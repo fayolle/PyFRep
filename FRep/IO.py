@@ -106,3 +106,48 @@ def saveVTK(filename, xyz, res, field):
         else:
             np.savetxt(f, field)
         f.write('\n')
+
+
+# Save mesh with a scalar value per node as VTK
+def saveSurfaceMeshVTK(filename, V, F, field):
+    number_nodes = len(V)
+    number_elements = len(F)
+    element_order = 3
+
+    with open(filename, 'w') as f:
+        f.write("# vtk DataFile Version 2.0\n")
+        f.write("Field\n")
+        f.write("ASCII\n")
+        f.write("\n")
+        f.write("DATASET UNSTRUCTURED_GRID\n")
+        f.write("POINTS %d double\n" % (len(V)))
+
+        # Write vertex coordinates
+        np.savetxt(f, V, fmt="%f %f %f")
+
+        cell_size = number_elements * (element_order + 1)
+        f.write("\n")
+        f.write("CELLS %d %d\n" % (number_elements, cell_size))
+        for i in range(number_elements):
+            f.write(" %d" % (element_order))
+            for j in range(element_order):
+                f.write(" %d" % (F[i, j]))
+            f.write("\n")
+
+        f.write("\n")
+        f.write("CELL_TYPES %d\n" % (number_elements))
+
+        # Triangle is cell type 5
+        for i in range(number_elements):
+            f.write("5\n")
+
+
+        f.write("\n")
+        f.write("POINT_DATA %d\n" % (number_nodes))
+        f.write("SCALARS field double\n")
+        f.write("LOOKUP_TABLE default\n")
+
+        for i in range(number_nodes):
+            f.write("%f\n" % (field[i]))
+
+        f.write("\n")

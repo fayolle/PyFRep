@@ -9,7 +9,7 @@ import FRep
 from FRep.primitives import sphere
 from FRep.mesh import evalToMesh
 from FRep.curvature import meanCurvature, GaussianCurvature
-from FRep.IO import writeOFF
+from FRep.IO import saveSurfaceMeshVTK
 
 import polyscope as ps
 
@@ -28,6 +28,11 @@ v, f, n = evalToMesh(model,
 # Evaluate the mean curvature at the vertices
 Km = meanCurvature(model, v)
 Kg = GaussianCurvature(model, v)
+
+# Write to file
+print('Save to file')
+saveSurfaceMeshVTK('sphere_mean_curvature.vtk', v, f, Km)
+saveSurfaceMeshVTK('sphere_Gaussian_curvature.vtk', v, f, Kg)
 
 ps.init()
 ps.register_surface_mesh("mesh", v, f, smooth_shade=True)

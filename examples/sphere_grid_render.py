@@ -35,13 +35,10 @@ def model(p):
     sphere_grid = intersection(union(sp_shell, intersection(sp, grid)), -x1)
     return sphere_grid
 
-
-print('Generating simple model')
 v, f, n = evalToMesh(model,
                      grid_min=(-11.0, -11.0, -11.0),
                      grid_max=(11.0, 11.0, 11.0),
                      grid_res=(64, 64, 64))
-print('Done')
 
 ps.init()
 ps.register_surface_mesh("mesh", v, f)

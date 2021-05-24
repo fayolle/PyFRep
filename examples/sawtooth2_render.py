@@ -20,13 +20,10 @@ def replicant(p):
     res6 = boundBlendUnion(res5, torus3, sp4, 0.08, 1.0, 1.0, 1.0)
     return res6
 
-
-print('Generating simple model')
 v, f, n = evalToMesh(replicant,
                      grid_min=(-10.0, -10.0, -10.0),
                      grid_max=(10.0, 10.0, 10.0),
                      grid_res=(64, 64, 64))
-print('Done')
 
 ps.init()
 ps.register_surface_mesh("mesh", v, f)

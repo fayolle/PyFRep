@@ -18,10 +18,8 @@ def model(p):
     return t4
 
 
-print('Generating simple model')
 v, f, n = evalToMesh(model,
                      grid_min=(-2, -2, -2),
                      grid_max=(2, 2, 2),
                      grid_res=(64, 64, 64))
 writeOFF('simple.off', v, f)
-print('Done')

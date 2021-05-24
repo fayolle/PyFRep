@@ -40,13 +40,10 @@ def model(p):
                         -p[:, 1])
     return temp
 
-
-print('Generating simple model')
 v, f, n = evalToMesh(model,
                      grid_min=(-11.0, -11.0, -11.0),
                      grid_max=(11.0, 11.0, 11.0),
                      grid_res=(64, 64, 64))
-print('Done')
 
 ps.init()
 ps.register_surface_mesh("mesh", v, f)

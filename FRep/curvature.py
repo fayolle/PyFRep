@@ -43,7 +43,6 @@ def GaussianCurvature(f, v):
     grad_ft = grad(ft, vt)
     norm_grad_ft = torch.linalg.norm(grad_ft, 2, dim=1)
     norm_grad_ft4 = norm_grad_ft**4
-    print(norm_grad_ft4.shape)
 
     grad_ft = grad_ft.reshape((grad_ft.shape[0], grad_ft.shape[1], 1))
 

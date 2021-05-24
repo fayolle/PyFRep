@@ -155,7 +155,7 @@ def trainPPoisson(num_iters, fun, grid_min, grid_max, p=2, device='cpu'):
     return model
 
 
-def trainEikonal(num_iters, fun, grid_min, grid_max, p=2, device='cpu'):
+def trainEikonal(num_iters, fun, grid_min, grid_max, device='cpu'):
     assert (len(grid_min) == len(grid_max))
     dimension = len(grid_min)
 
@@ -173,7 +173,7 @@ def trainEikonal(num_iters, fun, grid_min, grid_max, p=2, device='cpu'):
     # Train network
     for i in range(0, num_iters):
         # Uniform samples
-        x = uniform_samples(n_samples, grid_min, grid_max, device)
+        x = uniformSamples(n_samples, grid_min, grid_max, device)
         x.requires_grad = True
 
         # Input implicit

@@ -105,11 +105,6 @@ def trainPPoisson(num_iters, fun, grid_min, grid_max, p=2, device='cpu'):
     n_samples = 1024
     loss = 0
 
-    # regular Ggrid data
-    #res = (16,16,16)
-    #x = grid_samples(res, grid_min, grid_max, device)
-    #x.requires_grad = True
-
     # Train network
     for i in range(0, num_iters):
         # Uniform samples
@@ -124,10 +119,6 @@ def trainPPoisson(num_iters, fun, grid_min, grid_max, p=2, device='cpu'):
 
         f_d = model(x)
 
-        # Laplacian
-        #lap = laplacian(f_d, x)
-        #loss = torch.mean((lap + 1)**2)
-
         # p-Laplacian
         lap = pLaplacian(f_d, x, p)
         lap_constraint = torch.mean((lap + 1)**2)
@@ -139,9 +130,6 @@ def trainPPoisson(num_iters, fun, grid_min, grid_max, p=2, device='cpu'):
                 torch.exp(-1e2 * torch.abs(f_d))))
 
         loss = lap_constraint + extra_constraint
-
-        #if i%500 == 0:
-        #print(loss)
 
         loss.backward()
 
@@ -164,11 +152,6 @@ def trainEikonal(num_iters, fun, grid_min, grid_max, device='cpu'):
 
     n_samples = 1024
     loss = 0
-
-    # regular Ggrid data
-    #res = (16,16,16)
-    #x = grid_samples(res, grid_min, grid_max, device)
-    #x.requires_grad = True
 
     # Train network
     for i in range(0, num_iters):
@@ -195,9 +178,6 @@ def trainEikonal(num_iters, fun, grid_min, grid_max, device='cpu'):
                 torch.exp(-1e2 * torch.abs(f_d))))
 
         loss = g_constraint + extra_constraint
-
-        #if i%500 == 0:
-        #print(loss)
 
         loss.backward()
 

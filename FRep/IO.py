@@ -63,7 +63,7 @@ def readOFF(filename):
 
             assert len(face) > 1
 
-            faces.append(face)
+            faces.append(face[1:])
 
         return np.array(vertices), np.array(faces)
 

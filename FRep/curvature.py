@@ -9,6 +9,8 @@ def meanCurvature(f, v):
         # array.copy() is to prevent the case
         # where the numpy array has a negative stride
         vt = torch.tensor(v.copy())
+    else:
+        vt = v
 
     vt.requires_grad = True
 
@@ -33,6 +35,8 @@ def GaussianCurvature(f, v):
         # array.copy() is to prevent the case
         # where the numpy array has a negative stride
         vt = torch.tensor(v.copy())
+    else:
+        vt = v
 
     vt.requires_grad = True
 

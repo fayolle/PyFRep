@@ -151,3 +151,42 @@ def saveSurfaceMeshVTK(filename, V, F, field):
             f.write("%f\n" % (field[i]))
 
         f.write("\n")
+
+
+def savePointCloudVTK(filename, V, field):
+    number_nodes = len(V)
+
+    with open(filename, 'w') as f:
+        f.write("# vtk DataFile Version 2.0\n")
+        f.write("Field\n")
+        f.write("ASCII\n")
+        f.write("\n")
+        f.write("DATASET UNSTRUCTURED_GRID\n")
+        f.write("POINTS %d double\n" % (len(V)))
+
+        # Write vertex coordinates
+        np.savetxt(f, V, fmt="%f %f %f")
+
+        f.write("\n")
+        f.write("CELLS %d %d\n" % (number_nodes, 2*number_nodes))
+        for i in range(number_nodes):
+            f.write(" 1") # element order: 1 for point only
+            f.write(" %d" % i) # vertex index
+            f.write("\n")
+
+        f.write("\n")
+        f.write("CELL_TYPES %d\n" % (number_nodes))
+        # vertex is cell type: 1
+        for i in range(number_nodes):
+            f.write("1\n")
+            
+        f.write("\n")
+        f.write("POINT_DATA %d\n" % (number_nodes))
+        f.write("SCALARS field double\n")
+        f.write("LOOKUP_TABLE default\n")
+
+        for i in range(number_nodes):
+            f.write("%f\n" % (field[i]))
+
+        f.write("\n")
+

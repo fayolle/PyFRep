@@ -1,5 +1,9 @@
 import torch
 import torch.nn as nn
+import numpy.random
+import collections
+import random
+import copy
 
 
 # Wrapper such that the model can be used with Scikit optimize
@@ -95,3 +99,81 @@ def train(frep_model,
         parameters.append(param.detach().cpu().numpy())
 
     return parameters
+
+
+# An implementation of regularized evolution
+# See Algorithm 1 in https://arxiv.org/pdf/1802.01548.pdf
+
+class Evaluator(object):
+    def __init__(self, model_f, pc):
+        if not torch.is_tensor(pc):
+            self.pc = torch.tensor(pc)
+        else:
+            self.pc = pc
+            
+        self.model_f = model_f
+
+    def evalModel(self, params):
+        f = self.model_f(self.pc, params)
+        return torch.mean(f**2)
+
+
+class Individual(object):
+    def __init__(self):
+        self.params = None
+        self.score = None
+
+
+def randomParams(min_bounds, max_bounds, device='cpu'):
+    sz = len(min_bounds)
+    rand_params = []
+    for i in range(sz):
+        mini = min_bounds[i]
+        maxi = max_bounds[i]
+        rp = torch.FloatTensor(1, 1).uniform_(mini, maxi).to(device)
+        rand_params.append(rp)
+    return rand_params
+
+
+def mutateParams(params, min_bounds, max_bounds, device='cpu'):
+    new_params = copy.deepcopy(params)
+    sz = len(new_params)
+    idx = numpy.random.randint(low=0, high=sz)
+    minidx = min_bounds[idx]
+    maxidx = max_bounds[idx]
+    new_params[idx] = torch.FloatTensor(1, 1).uniform_(minidx, maxidx).to(device)
+    return new_params
+
+
+def regularizedEvolution(evaluator, lower_bounds, upper_bounds, cycles, population_size, sample_size):
+    population = collections.deque()
+    history = []
+
+    # initialize the population
+    while (len(population) < population_size):
+        c = Individual()
+        c.params = randomParams(lower_bounds, upper_bounds)
+        c.score = evaluator.evalModel(c.params)
+        population.append(c)
+        history.append(c)
+
+    while (len(history) < cycles):
+        # Sample models for the tournament
+        sample = []
+        while (len(sample) < sample_size):
+            candidate = random.choice(list(population))
+            sample.append(candidate)
+
+        # Get the best model from sample
+        parent = min(sample, key = lambda i: i.score)
+
+        # Add a mutated model and remove the oldest
+        child = Individual()
+        child.params = mutateParams(parent.params, lower_bounds, upper_bounds)
+        child.score = evaluator.evalModel(child.params)
+        population.append(child)
+        history.append(child)
+        population.popleft()
+
+    return history
+

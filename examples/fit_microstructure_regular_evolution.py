@@ -1,11 +1,10 @@
 import torch
 
 import FRep
-from FRep.primitives import *
 from FRep.ops import *
-from FRep.IO import readPointCloud
-from FRep.fitting import makeLossModel, train
-from scipy.optimize import dual_annealing
+from FRep.IO import readPointCloud, savePointCloudVTK
+from FRep.fitting import train, regularizedEvolution, Evaluator
+from FRep.mesh import *
 
 
 # Define the model
@@ -19,14 +18,14 @@ def model(p, param):
     offsp = norsp - offset
     sp_shell = difference(sp, offsp)
     t1 = norsp
-    scale1 = param[0]  # 9.0
-    scale2 = param[1]  # 3.0
+    scale1 = param[0]
+    scale2 = param[1]
     scale = scale1 * (1.0 - t1) + scale2 * t1
     xt = x0 * scale
     yt = x1 * scale
     zt = x2 * scale
-    freq1 = param[2]  # 0.75
-    freq2 = param[3]  # 0.85
+    freq1 = param[2]
+    freq2 = param[3]
     tsin = freq1 * (1.0 - t1) + freq2 * t1
     xslabs = torch.sin(xt) - tsin
     yslabs = torch.sin(yt) - tsin
@@ -42,20 +41,23 @@ def model(p, param):
 # Read a point cloud
 pc = readPointCloud('data/sphere_grid2.xyz')
 xyz = pc[:, 0:3]  # x,y,z coordinates only
+xyz = torch.tensor(xyz)
 
-# Loss function
-loss_model = makeLossModel(model, xyz)
+# Bounds for the parameters
+lower_bounds = [1.0, 1.0, 0.1, 0.1]
+upper_bounds = [10.0, 10.0, 2.0, 2.0]
 
-# Fit with simulated annealing
-lb = [1.0, 1.0, 0.1, 0.1]
-ub = [10.0, 10.0, 2.0, 2.0]
-res = dual_annealing(loss_model, bounds=list(zip(lb, ub)), seed=123)
-print('Solution:')
-print(res.x)
-print(res.fun)
+# Fit parameters with regularized evolution
+evaluator = Evaluator(model, xyz)
+history = regularizedEvolution(evaluator, lower_bounds, upper_bounds, cycles=10000, population_size=100, sample_size=10)
 
-# Fine tune with sgd
-lb = [1.0, 1.0, 0.1, 0.1]
-ub = [10.0, 10.0, 2.0, 2.0]
-param = train(model, lb, ub, xyz, param_init=res.x, num_iters=100)
-print(param)
+# Best creature
+best = min(history, key=lambda i: i.score)
+print('After regularized evolution')
+print(best.params)
+
+# Now use SGD to further optimize the parameters
+params = train(model, lower_bounds, upper_bounds, xyz, param_init=best.params, num_iters=100)
+print('After SGD')
+print(params)
+

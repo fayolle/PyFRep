@@ -33,7 +33,6 @@ def box(p, b):
     t2 = _min(t21, t22)
 
     return -(t1 + t2)
-    #return -(_length(_max(q, z)) + _min(torch.amax(q, axis=1), z))
 
 
 def roundedBox(p, b, radius):
@@ -48,7 +47,6 @@ def roundedBox(p, b, radius):
     t2 = _min(t21, t22)
 
     return -(t1 + t2 - radius)
-    #return -(_length(_max(q, z)) + _min(torch.amax(q, axis=1), z) - radius)
 
 
 def torus(p, r1, r2):
@@ -223,7 +221,7 @@ def torusX(x, center, R, r0):
     dyz = dyz - R
     dyzx = torch.sqrt(dyz**2 + x2[:, 0]**2)
     dyzx = dyzx - r0
-    return (-dyzx)
+    return -dyzx
 
 
 def torusY(x, center, R, r0):
@@ -235,7 +233,7 @@ def torusY(x, center, R, r0):
     dxz = dxz - R
     dxzy = torch.sqrt(dxz**2 + x2[:, 1]**2)
     dxzy = dxzy - r0
-    return (-dxzy)
+    return -dxzy
 
 
 def torusZ(x, center, R, r0):
@@ -247,4 +245,11 @@ def torusZ(x, center, R, r0):
     dxy = dxy - R
     dxyz = torch.sqrt(dxy**2 + x2[:, 2]**2)
     dxyz = dxyz - r0
-    return (-dxyz)
+    return -dxyz
+
+
+def plane(p, n, h):
+    if not torch.is_tensor(n):
+        n = torch.tensor(n)
+
+    return -(p[:,0]*n[:,0] + p[:,1]*n[:,1] + p[:,2]*n[:,2] + h)

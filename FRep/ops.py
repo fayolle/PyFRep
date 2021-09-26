@@ -41,13 +41,31 @@ def union(d1, d2):
     return d
 
 
+def union_m(d1, d2, m=2):
+    nd = torch.sqrt(d1**2 + d2**2)
+    d = (d1 + d2 + nd)*(nd**m)
+    return d
+
+
 def difference(d1, d2):
     d = d1 - d2 - torch.sqrt(d1**2 + d2**2)
     return d
 
 
+def difference_m(d1, d2, m=2):
+    nd = torch.sqrt(d1**2 + d2**2)
+    d = (d1 - d2 - nd)*(nd**m)
+    return d
+
+
 def intersection(d1, d2):
     d = d1 + d2 - torch.sqrt(d1**2 + d2**2)
+    return d
+
+
+def intersection_m(d1, d2, m=2):
+    nd = torch.sqrt(d1**2 + d2**2)
+    d = (d1 + d2 - nd)*(nd**m)
     return d
 
 

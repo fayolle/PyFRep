@@ -39,7 +39,6 @@ def model(p, param):
 
 
 # Read a point cloud
-# wget https://gist.githubusercontent.com/fayolle/4788f619b54ec255f1a771e1cced8369/raw/fbab656736c4af1b4aab1a483e95abb02d2de88f/sphere_grid2.xyz
 pc = readPointCloud('data/sphere_grid2.xyz')
 xyz = pc[:, 0:3]  # x,y,z coordinates only
 

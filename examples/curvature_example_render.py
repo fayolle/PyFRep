@@ -1,5 +1,5 @@
 '''
-Example to illustrate computing the mean curvature of an implicit surface 
+Example illustrating the computation of the mean curvature of an implicit surface 
 and rendering it. 
 '''
 

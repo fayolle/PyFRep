@@ -82,3 +82,45 @@ def torchLinearGrid(grid_min, grid_max, grid_res, device='cpu'):
 def torchLinearSampling(model, xyz):
     d = model(xyz)
     return d
+
+
+# Return a uniform grid 
+# grid_min, grid_max: arrays of dim 3
+# grid_res: integer (resolution along each axis)
+# device: device type (cuda or cpu) for torch 
+# indexing: string specifying the type of indexing to use 
+def getUniformGrid(grid_min, grid_max, grid_res, device, indexing = 'mc'):
+    eps = 0.1
+    
+    bounding_box = grid_max - grid_min
+    shortest_axis = np.argmin(bounding_box)
+
+    if (shortest_axis == 0):
+        x = np.linspace(grid_min[shortest_axis] - eps, grid_max[shortest_axis] + eps, grid_res)
+        length = np.max(x) - np.min(x)
+        y = np.arange(grid_min[1] - eps, grid_max[1] + length / (x.shape[0] - 1) + eps, length / (x.shape[0] - 1))
+        z = np.arange(grid_min[2] - eps, grid_max[2] + length / (x.shape[0] - 1) + eps, length / (x.shape[0] - 1))
+    elif (shortest_axis == 1):
+        y = np.linspace(grid_min[shortest_axis] - eps, grid_max[shortest_axis] + eps, grid_res)
+        length = np.max(y) - np.min(y)
+        x = np.arange(grid_min[0] - eps, grid_max[0] + length / (y.shape[0] - 1) + eps, length / (y.shape[0] - 1))
+        z = np.arange(grid_min[2] - eps, grid_max[2] + length / (y.shape[0] - 1) + eps, length / (y.shape[0] - 1))
+    elif (shortest_axis == 2):
+        z = np.linspace(grid_min[shortest_axis] - eps, grid_max[shortest_axis] + eps, grid_res)
+        length = np.max(z) - np.min(z)
+        x = np.arange(grid_min[0] - eps, grid_max[0] + length / (z.shape[0] - 1) + eps, length / (z.shape[0] - 1))
+        y = np.arange(grid_min[1] - eps, grid_max[1] + length / (z.shape[0] - 1) + eps, length / (z.shape[0] - 1))
+
+    # Different types of indexing for meshing with the Marching Cubes algorithm 
+    # or exporting to VTK 
+    if (indexing == 'mc'):
+        xx, yy, zz = np.meshgrid(x, y, z)
+    elif (indexing == 'vtk'):
+        xx, yy, zz = np.meshgrid(x, y, z, indexing='ij')
+
+    if device.type == 'cuda': 
+        grid_points = torch.tensor(np.vstack([xx.ravel(), yy.ravel(), zz.ravel()]).T, dtype=torch.float).cuda()
+    else:
+        grid_points = torch.tensor(np.vstack([xx.ravel(), yy.ravel(), zz.ravel()]).T, dtype=torch.float).cpu()
+
+    return {"grid_points":grid_points, "xyz":[x,y,z], "resolution": [xx.shape[0], xx.shape[1], xx.shape[2]]}

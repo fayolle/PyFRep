@@ -124,3 +124,22 @@ def getUniformGrid(grid_min, grid_max, grid_res, device, indexing = 'mc'):
         grid_points = torch.tensor(np.vstack([xx.ravel(), yy.ravel(), zz.ravel()]).T, dtype=torch.float).cpu()
 
     return {"grid_points":grid_points, "xyz":[x,y,z], "resolution": [xx.shape[0], xx.shape[1], xx.shape[2]]}
+
+
+def genVoxels(model, grid_min, grid_max, grid_res, device):
+    with torch.no_grad():
+        model.eval()
+
+        # volumetric grid for sampling the model
+        grid = getUniformGrid(grid_min, grid_max, grid_res, device, indexing='vtk')
+
+        z = []
+
+        for i,pnts in enumerate(torch.split(grid['grid_points'], 100000, dim=0)):
+            z.append(model(pnts).detach().cpu().numpy())
+
+        z = np.concatenate(z,axis=0)
+
+        # Return the (linearized) grid
+        return grid, z
+

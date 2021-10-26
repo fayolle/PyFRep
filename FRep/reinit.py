@@ -10,9 +10,9 @@ from .diff import grad, Laplacian, pLaplacian
 
 
 # Implicit as a neural network
-class ImplicitNN(nn.Module):
+class ImplicitNNFun(nn.Module):
     def __init__(self, fun, dimension):
-        super(ImplicitNN, self).__init__()
+        super(ImplicitNNFun, self).__init__()
 
         d_in = dimension
         dims = [512, 512, 512, 512, 512, 512, 512, 512]
@@ -62,7 +62,7 @@ class ImplicitNN(nn.Module):
 
 
 def loadModel(path, dim=3, device=torch.device('cpu')):
-    model = ImplicitNN(dim).to(device)
+    model = ImplicitNNFun(dim).to(device)
     try:
         checkpoint = torch.load(path,
                                 map_location=lambda storage, loc: storage)
@@ -99,7 +99,7 @@ def trainPPoisson(num_iters, fun, grid_min, grid_max, p=2, device=torch.device('
     assert (len(grid_min) == len(grid_max))
     dimension = len(grid_min)
 
-    model = ImplicitNN(fun=fun, dimension=dimension).to(device)
+    model = ImplicitNNFun(fun=fun, dimension=dimension).to(device)
     optimizer = torch.optim.Adam(model.parameters(), lr=0.0001)
 
     n_samples = 1024
@@ -147,7 +147,7 @@ def trainEikonal(num_iters, fun, grid_min, grid_max, device=torch.device('cpu'))
     assert (len(grid_min) == len(grid_max))
     dimension = len(grid_min)
 
-    model = ImplicitNN(fun=fun, dimension=dimension).to(device)
+    model = ImplicitNNFun(fun=fun, dimension=dimension).to(device)
     optimizer = torch.optim.Adam(model.parameters(), lr=0.0001)
 
     n_samples = 1024

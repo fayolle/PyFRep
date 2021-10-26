@@ -24,6 +24,11 @@ v, f, n = evalToMesh(model,
                      grid_max=(2, 2, 2),
                      grid_res=(64, 64, 64))
 
+#v, f, n = evalToMesh2(model,
+#                     grid_min=(-2, -2, -2),
+#                     grid_max=(2, 2, 2),
+#                     grid_res=64)
+
 ps.init()
 ps.register_surface_mesh("mesh", v, f)
 ps.show()

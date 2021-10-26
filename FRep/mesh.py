@@ -1,6 +1,7 @@
 import skimage.measure as sk
 import numpy as np
 import torch
+import torch.nn as nn 
 from .grid import torchGrid, torchSampling, getUniformGrid 
 
 
@@ -41,9 +42,13 @@ def evalToMesh(model, grid_min, grid_max, grid_res, device='cpu'):
 # (assume the grid resolution is grid_res x grid_res x grid_res)
 #
 # Ultimately this should replace evalToMesh()
-def evalToMesh2(model, grid_min, grid_max, grid_res, device, mc_value = 0.0):
+def evalToMesh2(model, grid_min, grid_max, grid_res, device = torch.device('cpu'), mc_value = 0.0):
     with torch.no_grad():
-        model.eval()
+        if isinstance(model, nn.Module):
+            model.eval()
+
+        grid_min = np.array(grid_min)
+        grid_max = np.array(grid_max)
 
         # volumetric grid for sampling the model
         grid = getUniformGrid(grid_min, grid_max, grid_res, device, indexing='mc')
@@ -59,7 +64,7 @@ def evalToMesh2(model, grid_min, grid_max, grid_res, device, mc_value = 0.0):
             z  = z.astype(np.float64)
 
             #verts, faces, normals, values = measure.marching_cubes_lewiner(
-            verts, faces, normals, values = measure.marching_cubes(
+            verts, faces, normals, values = sk.marching_cubes(
                 volume=z.reshape(grid['xyz'][1].shape[0], grid['xyz'][0].shape[0], grid['xyz'][2].shape[0]).transpose([1, 0, 2]),
                 level=mc_value,
                 spacing=(grid['xyz'][0][2] - grid['xyz'][0][1],
@@ -69,5 +74,5 @@ def evalToMesh2(model, grid_min, grid_max, grid_res, device, mc_value = 0.0):
             verts = verts + np.array([grid['xyz'][0][0],grid['xyz'][1][0],grid['xyz'][2][0]])
 
         # Return the mesh
-        return verts, faces
+        return verts, faces, normals 
 

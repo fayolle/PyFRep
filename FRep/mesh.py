@@ -5,7 +5,7 @@ import torch.nn as nn
 from .grid import torchGrid, torchSampling, getUniformGrid 
 
 
-def evalToMesh(model, grid_min, grid_max, grid_res, device='cpu'):
+def evalToMesh(model, grid_min, grid_max, grid_res, device=torch.device('cpu')):
     x, y, z = torchGrid(grid_min, grid_max, grid_res, device)
     volume = torchSampling(model, x, y, z)
     volume = volume.detach().cpu().numpy()

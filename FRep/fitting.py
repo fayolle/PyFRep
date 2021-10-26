@@ -63,7 +63,7 @@ def train(frep_model,
           param_init=[],
           num_iters=100,
           batch_size=1024,
-          device='cpu'):
+          device=torch.device('cpu')):
     model = Model(frep_model,
                   lower_bound,
                   upper_bound,
@@ -124,7 +124,7 @@ class Individual(object):
         self.score = None
 
 
-def randomParams(min_bounds, max_bounds, device='cpu'):
+def randomParams(min_bounds, max_bounds, device=torch.device('cpu')):
     sz = len(min_bounds)
     rand_params = []
     for i in range(sz):
@@ -135,7 +135,7 @@ def randomParams(min_bounds, max_bounds, device='cpu'):
     return rand_params
 
 
-def mutateParams(params, min_bounds, max_bounds, device='cpu'):
+def mutateParams(params, min_bounds, max_bounds, device=torch.device('cpu')):
     new_params = copy.deepcopy(params)
     sz = len(new_params)
     idx = numpy.random.randint(low=0, high=sz)

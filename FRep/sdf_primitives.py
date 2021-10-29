@@ -91,19 +91,32 @@ def cappedCylinder(p, a, b, radius):
         a = torch.tensor(a)
     if not torch.is_tensor(b):
         b = torch.tensor(b)
+
     ba = b - a
     pa = p - a
+
     baba = torch.dot(ba, ba)
-    paba = torch.dot(pa, ba).reshape((-1, 1))
+    #paba = torch.dot(pa, ba).reshape((-1, 1))
+    paba = torch.matmul(pa, ba)
+    paba = paba.reshape((-1,1))
+
     x = _length(pa * baba - ba * paba) - radius * baba
     y = torch.abs(paba - baba * 0.5) - baba * 0.5
     x = x.reshape((-1, 1))
     y = y.reshape((-1, 1))
     x2 = x * x
     y2 = y * y * baba
+
+    xtmp = torch.where(x>0, x2, torch.Tensor([0.]))
+    ytmp = torch.where(y>0, y2, torch.Tensor([0.]))
+
+    '''
     d = torch.where(
         _max(x, y) < 0, -_min(x2, y2),
-        torch.where(x > 0, x2, 0) + torch.where(y > 0, y2, 0))
+        torch.where(x > 0, x2, 0.0) + torch.where(y > 0, y2, 0.0))
+    '''
+    d = torch.where(_max(x,y)<0, -_min(x2,y2), xtmp+ytmp)
+
     return -torch.sign(d) * torch.sqrt(torch.abs(d)) / baba
 
 

@@ -79,14 +79,10 @@ def model(p):
 
 
 v, f, n = evalToMesh(model,
-                     grid_min=(-6, -6, -3.6),
-                     grid_max=(6, 6, 3.6),
+                     grid_min=(-6.0, -6.0, -3.6),
+                     grid_max=(6.0, 6.0, 3.6),
                      grid_res=(64, 64, 64))
 
-#v, f, n = evalToMesh2(model,
-#                     grid_min=(-2, -2, -2),
-#                     grid_max=(2, 2, 2),
-#                     grid_res=64)
 
 ps.init()
 ps.register_surface_mesh("mesh", v, f)

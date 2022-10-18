@@ -266,3 +266,24 @@ def plane(p, n, h):
         n = torch.tensor(n)
 
     return -(p[:,0]*n[:,0] + p[:,1]*n[:,1] + p[:,2]*n[:,2] + h)
+
+
+def frame(p, side_length, thickness):
+    if not torch.is_tensor(side_length):
+        side_length = torch.tensor(side_length)
+    if not torch.is_tensor(thickness):
+        thickness = torch.tensor(thickness)
+
+    pt = torch.abs(p) - side_length/2.0 - thickness/2.0
+    qt = torch.abs(pt + thickness/2.0) - thickness/2.0
+    ptx, pty, ptz = pt[:,0], pt[:,1], pt[:,2]
+    qtx, qty, qtz = qt[:,0], qt[:,1], qt[:,2]
+
+    z1 = torch.zeros_like(pt)
+    z2 = torch.zeros_like(ptx)
+
+    t1 = _length(_max(_vec(ptx, qty, qtz), z1)) + _min(_max(ptx, _max(qty, qtz)), z2)
+    t2 = _length(_max(_vec(qtx, pty, qtz), z1)) + _min(_max(qtx, _max(pty, qtz)), z2)
+    t3 = _length(_max(_vec(qtx, qty, ptz), z1)) + _min(_max(qtx, _max(qty, ptz)), z2)
+
+    return -(_min(_min(t1, t2), t3))

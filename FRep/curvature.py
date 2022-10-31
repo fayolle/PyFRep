@@ -94,3 +94,17 @@ def GaussianCurvature(f, v):
 
     Kg = tmp4.detach().cpu().numpy()
     return Kg
+
+
+def principalCurvatures(f, v):
+    '''
+    Compute the principal curvatures kmin and kmax for the implicit surface f 
+    at the points v. 
+    '''
+    H = meanCurvature(f, v)
+    K = GaussianCurvature(f, v)
+    h2k = torch.sqrt(H**2 - K)
+    kmin = H - h2k
+    kmax = H + h2k
+    return (kmin, kmax)
+

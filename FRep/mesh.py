@@ -33,16 +33,18 @@ def evalToMesh(model, grid_min, grid_max, grid_res, device=torch.device('cpu')):
     return vertices, faces, normals
 
 
-# Return a triangle mesh:
-# (verts, faces)
-# where verts is the list of vertex coordinates
-# and faces is the list of polygon indices.
-# 
-# Note: grid_res is a scalar here 
-# (assume the grid resolution is grid_res x grid_res x grid_res)
-#
-# Ultimately this should replace evalToMesh()
 def evalToMesh2(model, grid_min, grid_max, grid_res, device = torch.device('cpu'), mc_value = 0.0):
+    '''
+    Return the triangle mesh (verts, faces), where 
+    verts is the list of vertex coordinates 
+    and faces is the list of polygon indices.
+
+    Remark: grid_res is a scalar here 
+    (assume that the grid resolution is grid_res x grid_res x grid_res)
+    '''
+
+    # Note: Ultimately this should replace evalToMesh()
+
     with torch.no_grad():
         if isinstance(model, nn.Module):
             model.eval()

@@ -80,16 +80,23 @@ def torchLinearGrid(grid_min, grid_max, grid_res, device=torch.device('cpu')):
 
 
 def torchLinearSampling(model, xyz):
+    '''
+    Sample model on the points xyz. 
+    '''
     d = model(xyz)
     return d
 
-
-# Return a uniform grid 
-# grid_min, grid_max: arrays of dim 3
-# grid_res: integer (resolution along each axis)
-# device: device type (cuda or cpu) for torch 
-# indexing: string specifying the type of indexing to use 
+ 
 def getUniformGrid(grid_min, grid_max, grid_res, device, indexing = 'mc'):
+    '''
+    Return a uniform grid.
+
+    grid_min, grid_max: arrays of dim 3.
+    grid_res: integer (resolution along each axis).
+    device: device type (cuda or cpu) for torch. 
+    indexing: string specifying the type of indexing to use. 
+    '''
+
     eps = 0.1
     
     bounding_box = grid_max - grid_min

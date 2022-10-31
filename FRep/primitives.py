@@ -297,7 +297,7 @@ def convPoint(p, vect, S, T):
 
 def convLine(p, begin, end, S, T):
     '''  
-    Primitive: Аnalytical convolution for a segment with Cauchy kernel 
+    Primitive: Analytical convolution for a segment with Cauchy kernel 
     [McCormack and Sherstyuk 1998]
     Definition:  1 / (1 + S^2*R^2)^2
                  R is the distance between primitive and x

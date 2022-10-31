@@ -87,6 +87,8 @@ def translate(p, offset):
 
 
 def rotate3DX(p, theta):
+    if not torch.is_tensor(theta):
+        theta = torch.tensor(theta)
     p2 = p.clone()
     p2[:, 1] = p[:, 1] * torch.cos(theta) + p[:, 2] * torch.sin(theta)
     p2[:, 2] = -p[:, 1] * torch.sin(theta) + p[:, 2] * torch.cos(theta)
@@ -94,6 +96,8 @@ def rotate3DX(p, theta):
 
 
 def rotate3DY(p, theta):
+    if not torch.is_tensor(theta):
+        theta = torch.tensor(theta)
     p2 = p.clone()
     p2[:, 2] = p[:, 2] * torch.cos(theta) + p[:, 0] * torch.sin(theta)
     p2[:, 0] = -p[:, 2] * torch.sin(theta) + p[:, 0] * torch.cos(theta)
@@ -101,6 +105,8 @@ def rotate3DY(p, theta):
 
 
 def rotate3DZ(p, theta):
+    if not torch.is_tensor(theta):
+        theta = torch.tensor(theta)
     p2 = p.clone()
     p2[:, 0] = p[:, 0] * torch.cos(theta) + p[:, 1] * torch.sin(theta)
     p2[:, 1] = -p[:, 0] * torch.sin(theta) + p[:, 1] * torch.cos(theta)

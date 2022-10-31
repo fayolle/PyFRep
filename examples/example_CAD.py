@@ -2,11 +2,15 @@ import FRep
 from FRep.sdf_primitives import *
 from FRep.sdf_ops import *
 from FRep.mesh import *
+from FRep.ops import rotate3DX
 
 import polyscope as ps
 
 
 def model(p):
+    piover2 = 1.5707963267948966192
+    p = rotate3DX(p, -piover2)
+
     a1 = [1.078, 3.327, -3.0]
     b1 = [1.078, 3.327, 3.0]
     cyl1 = cappedCylinder(p, a1, b1, 0.5)
@@ -79,8 +83,8 @@ def model(p):
 
 
 v, f, n = evalToMesh(model,
-                     grid_min=(-6.0, -6.0, -3.6),
-                     grid_max=(6.0, 6.0, 3.6),
+                     grid_min=(-6.0, -3.6, -6.0),
+                     grid_max=(6.0, 3.6, 6.0),
                      grid_res=(64, 64, 64))
 
 

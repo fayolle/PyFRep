@@ -45,7 +45,7 @@ def torchGrid(grid_min, grid_max, grid_res, device=torch.device('cpu')):
     y = torch.arange(grid_min[1], grid_max[1], step=dy / float(resy))
     dz = grid_max[2] - grid_min[2]
     z = torch.arange(grid_min[2], grid_max[2], step=dz / float(resz))
-    xx, yy, zz = torch.meshgrid(x, y, z)
+    xx, yy, zz = torch.meshgrid(x, y, z, indexing='ij')
     return xx.to(device), yy.to(device), zz.to(device)
 
 
@@ -70,7 +70,7 @@ def torchLinearGrid(grid_min, grid_max, grid_res, device=torch.device('cpu')):
     y = torch.arange(grid_min[1], grid_max[1], step=dy / float(resy))
     dz = grid_max[2] - grid_min[2]
     z = torch.arange(grid_min[2], grid_max[2], step=dz / float(resz))
-    xx, yy, zz = torch.meshgrid(x, y, z)
+    xx, yy, zz = torch.meshgrid(x, y, z, indexing='ij')
     xx = xx.to(device)
     yy = yy.to(device)
     zz = zz.to(device)

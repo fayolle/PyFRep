@@ -16,12 +16,12 @@ def normalize(f, x, method='Rvachev'):
     #x.requires_grad = True
 
     if method == 'Taubin':
-        return normalize_Taubin(f, x)
+        return normalizeTaubin(f, x)
     else:
-        return normalize_Rvachev(f, x)
+        return normalizeRvachev(f, x)
 
 
-def normalize_Rvachev(f, x):
+def normalizeRvachev(f, x):
     """Implements the (first order) Rvachev normalization.
 
     Implements the first order Rvachev normalization of the implicit surface 
@@ -36,7 +36,7 @@ def normalize_Rvachev(f, x):
     return w1
 
 
-def normalize_Taubin(f, x):
+def normalizeTaubin(f, x):
     """Implements the Taubin normalization. 
 
     Implements the Taubin normalization of the implicit surface f() at the 

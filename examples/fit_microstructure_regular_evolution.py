@@ -2,7 +2,7 @@ import torch
 
 import FRep
 from FRep.ops import *
-from FRep.IO import readPointCloud, savePointCloudVTK
+from FRep.IO import readPointCloud
 from FRep.fitting import train, regularizedEvolution, Evaluator
 from FRep.mesh import *
 

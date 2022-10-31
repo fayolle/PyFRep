@@ -76,7 +76,7 @@ def readPointCloud(filename):
 
 
 # Save field
-def saveVTK(filename, xyz, res, field):
+def writeVTK(filename, xyz, res, field):
     resx, resy, resz = res
 
     field_title = 'VALUE'
@@ -109,7 +109,7 @@ def saveVTK(filename, xyz, res, field):
 
 
 # Save mesh with a scalar value per node as VTK
-def saveSurfaceMeshVTK(filename, V, F, field):
+def writeSurfaceMeshVTK(filename, V, F, field):
     number_nodes = len(V)
     number_elements = len(F)
     element_order = 3
@@ -153,7 +153,7 @@ def saveSurfaceMeshVTK(filename, V, F, field):
         f.write("\n")
 
 
-def savePointCloudVTK(filename, V, field):
+def writePointCloudVTK(filename, V, field):
     number_nodes = len(V)
 
     with open(filename, 'w') as f:

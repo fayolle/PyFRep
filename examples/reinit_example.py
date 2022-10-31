@@ -2,7 +2,7 @@ import FRep
 from FRep.primitives import *
 from FRep.reinit import trainPPoisson
 from FRep.grid import torchLinearGrid, torchLinearSampling
-from FRep.IO import saveVTK
+from FRep.IO import writeVTK
 
 
 def model(p):
@@ -21,4 +21,4 @@ xyz = torchLinearGrid(grid_min=(-2.0, -2.0, -2.0),
                       grid_res=(16, 16, 16),
                       device='cpu')
 f = torchLinearSampling(modelNN, xyz)
-saveVTK('test.vtk', xyz, (16, 16, 16), f)
+writeVTK('test.vtk', xyz, (16, 16, 16), f)

@@ -1,4 +1,3 @@
-import math
 import torch
 import torch.nn as nn
 import torch.autograd as autograd
@@ -36,7 +35,6 @@ class Implicit(nn.Module):
                 torch.nn.init.normal_(lin.weight, 0.0, np.sqrt(2) / np.sqrt(out_dim))
             setattr(self, "lin" + str(layer), lin)
         self.activation = nn.Softplus(beta=beta)
-        #self.activation = nn.ReLU()
     
     def forward(self, input):
         x = input
@@ -80,7 +78,6 @@ class ImplicitFun(nn.Module):
             setattr(self, "lin" + str(layer), lin)
         
         self.activation = nn.Softplus(beta=beta)
-        #self.activation = nn.ReLU()
         self.fun = fun
 
     def forward(self, input):
@@ -125,9 +122,10 @@ def pLaplacian(y, x, p=2):
     return div(g, x)
 
 
-# Read a 3d point-cloud (points with normals) 
-# and return a torch tensor 
 def read_xyzn(filename, device):
+    '''
+    Read a 3d point-cloud (points with normals) and return a torch tensor 
+    '''
     with open(filename, 'r') as f:
         raw_data = np.loadtxt(f)
     
@@ -146,8 +144,11 @@ def read_xyzn(filename, device):
     return data
 
 
-# Compute the bbox (the corners): xmin and xmax for a given 3d point-cloud
 def xyzn_bbox(xyzn):
+    '''
+    Compute the axis oriented bounding box (the corners): xmin and xmax 
+    for a given 3d point-cloud (xyzn). 
+    '''
     xmin = xyzn[:,0].min()
     xmax = xyzn[:,0].max()
     ymin = xyzn[:,1].min()
@@ -182,6 +183,10 @@ def uniformSamples(num_points, grid_min, grid_max, device):
 
 
 def train(num_epochs, data, device, batch_size=None):
+    '''
+    Function for training an implicit model (MLP) to fit a given 3D point-cloud 
+    '''
+
     # Weights for the loss terms 
     w_geo = 1.0
     w_grad = 0.1 # 1.0 
@@ -230,6 +235,12 @@ def train(num_epochs, data, device, batch_size=None):
 
 
 def train_eikonal(num_iters, fun, grid_min, grid_max, device):
+    '''
+    Function for training an implicit model (MLP) to fit 
+    a given 3D point-cloud, while enforcing that the implicit behaves 
+    like the signed distance to the surface. 
+    '''
+
     assert(len(grid_min) == len(grid_max))
     dimension = len(grid_min)
 
@@ -271,20 +282,26 @@ def train_eikonal(num_iters, fun, grid_min, grid_max, device):
     return model
 
 
-# Return a function f(x,y,z) with zero level-set approximating 
-# the point cloud corresponding to filename
 def freeformFit(filename, num_epochs, batch_size, device):
+    '''
+    Return a function f(x,y,z) with zero level-set approximating 
+    the point cloud corresponding to filename. 
+    '''
+
     xyzn = read_xyzn(filename, device=device)
     #xmin, xmax = xyzn_bbox(xyzn)
     model_surf = train(num_epochs, xyzn, device=device, batch_size=batch_size)
     return model_surf, xyzn
 
-
-# Return a distance function d(x,y,z) with zero level-set approximating 
-# the point cloud corresponding to filename 
+ 
 def freeformDistFit(filename, num_iters, num_epochs, batch_size, device):
+    '''
+    Return a distance function d(x,y,z) with zero level-set approximating 
+    the point cloud corresponding to filename 
+    '''
+
     xyzn = read_xyzn(filename, device=device)
-    #xmin, xmax = xyzn_bbox(xyzn)
+    xmin, xmax = xyzn_bbox(xyzn)
     model_surf = train(num_epochs, xyzn, device=device, batch_size=batch_size) 
     
     # Freeze the parameters (such that they don't get updated by train_eikonal)

@@ -5,6 +5,9 @@ from .diff import grad, div
 
 # Compute the mean curvature of f at v (v: points on the surface f=0)
 def meanCurvature(f, v):
+    '''
+    Compute the mean curvature for the implicit surface f at the points v. 
+    '''
     if not torch.is_tensor(v):
         # array.copy() is to prevent the case
         # where the numpy array has a negative stride
@@ -31,6 +34,9 @@ def meanCurvature(f, v):
 
 
 def GaussianCurvature(f, v):
+    '''
+    Compute the Gaussian curvature for the implicit surface f at the points v. 
+    '''
     if not torch.is_tensor(v):
         # array.copy() is to prevent the case
         # where the numpy array has a negative stride

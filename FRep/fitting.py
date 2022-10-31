@@ -6,8 +6,10 @@ import random
 import copy
 
 
-# Wrapper such that the model can be used with Scikit optimize
 def makeLossModel(model, pc):
+    '''
+    Wrapper such that the model can be used with Scikit optimize.
+    '''
     if (not torch.is_tensor(pc)):
         pc = torch.tensor(pc)
 
@@ -22,8 +24,11 @@ def makeLossModel(model, pc):
     return lossModel
 
 
-# Wrapper class for fitting FRep models
 class Model(nn.Module):
+    '''
+    Wrapper class for fitting FRep models
+    '''
+
     def __init__(self,
                  frep_model,
                  lower_bound,
@@ -55,7 +60,6 @@ class Model(nn.Module):
         return self._frep_model(x, self.param)
 
 
-# Fit parameters by sgd
 def train(frep_model,
           lower_bound,
           upper_bound,
@@ -64,6 +68,12 @@ def train(frep_model,
           num_iters=100,
           batch_size=1024,
           device=torch.device('cpu')):
+
+    '''
+    Fit parameters of frep_model by stochastic gradient descent, 
+    given an input point-cloud and bounds on the parameters. 
+    '''
+
     model = Model(frep_model,
                   lower_bound,
                   upper_bound,
@@ -89,8 +99,6 @@ def train(frep_model,
             loss = torch.mean(f**2)
             loss.backward()
             optimizer.step()
-
-        #print('iter ' + str(i) + ': ' + str(loss))
 
     model.eval()
 

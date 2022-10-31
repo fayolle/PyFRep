@@ -85,7 +85,7 @@ def model(p):
 v, f, n = evalToMesh(model,
                      grid_min=(-6.0, -3.6, -6.0),
                      grid_max=(6.0, 3.6, 6.0),
-                     grid_res=(64, 64, 64))
+                     grid_res=(128, 128, 128))
 
 
 ps.init()

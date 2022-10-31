@@ -23,7 +23,7 @@ def replicant(p):
 v, f, n = evalToMesh(replicant,
                      grid_min=(-10.0, -10.0, -10.0),
                      grid_max=(10.0, 10.0, 10.0),
-                     grid_res=(64, 64, 64))
+                     grid_res=(128, 128, 128))
 
 ps.init()
 ps.register_surface_mesh("mesh", v, f)

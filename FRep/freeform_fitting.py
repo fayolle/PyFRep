@@ -122,7 +122,7 @@ def pLaplacian(y, x, p=2):
     return div(g, x)
 
 
-def read_xyzn(filename, device):
+def readXYZN(filename, device):
     '''
     Read a 3d point-cloud (points with normals) and return a torch tensor 
     '''
@@ -144,7 +144,7 @@ def read_xyzn(filename, device):
     return data
 
 
-def xyzn_bbox(xyzn):
+def xyznBbox(xyzn):
     '''
     Compute the axis oriented bounding box (the corners): xmin and xmax 
     for a given 3d point-cloud (xyzn). 
@@ -234,7 +234,7 @@ def train(num_epochs, data, device, batch_size=None):
     return model
 
 
-def train_eikonal(num_iters, fun, grid_min, grid_max, device):
+def trainEikonal(num_iters, fun, grid_min, grid_max, device):
     '''
     Function for training an implicit model (MLP) to fit 
     a given 3D point-cloud, while enforcing that the implicit behaves 
@@ -288,7 +288,7 @@ def freeformFit(filename, num_epochs, batch_size, device):
     the point cloud corresponding to filename. 
     '''
 
-    xyzn = read_xyzn(filename, device=device)
+    xyzn = readXYZN(filename, device=device)
     #xmin, xmax = xyzn_bbox(xyzn)
     model_surf = train(num_epochs, xyzn, device=device, batch_size=batch_size)
     return model_surf, xyzn
@@ -300,11 +300,11 @@ def freeformDistFit(filename, num_iters, num_epochs, batch_size, device):
     the point cloud corresponding to filename 
     '''
 
-    xyzn = read_xyzn(filename, device=device)
-    xmin, xmax = xyzn_bbox(xyzn)
+    xyzn = readXYZN(filename, device=device)
+    xmin, xmax = xyznBbox(xyzn)
     model_surf = train(num_epochs, xyzn, device=device, batch_size=batch_size) 
     
-    # Freeze the parameters (such that they don't get updated by train_eikonal)
+    # Freeze the parameters (such that they don't get updated by trainEikonal)
     for param in model_surf.parameters():
         param.requires_grad = False
 
@@ -313,9 +313,9 @@ def freeformDistFit(filename, num_iters, num_epochs, batch_size, device):
     #c = f_xyzn.mean() 
     #c_no_grad = c.detach()
     #model_surf_offset = lambda x: model_surf(x) - c_no_grad 
-    #model_eik = train_eikonal(num_iters=num_iters, fun=model_surf_offset, grid_min=xmin, grid_max=xmax, device=device)
+    #model_eik = trainEikonal(num_iters=num_iters, fun=model_surf_offset, grid_min=xmin, grid_max=xmax, device=device)
     
-    model_eik = train_eikonal(num_iters=num_iters, fun=model_surf, grid_min=xmin, grid_max=xmax, device=device)
+    model_eik = trainEikonal(num_iters=num_iters, fun=model_surf, grid_min=xmin, grid_max=xmax, device=device)
 
     return model_eik, xyzn 
 

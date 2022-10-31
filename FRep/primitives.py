@@ -211,8 +211,8 @@ def superEll(p, center, a, b, c, s1, s2):
     zt = (p[:, 2] - center[2]) / c
 
     pp = 2.0 / s2
-    xp = (torch.abs(xt))**p
-    yp = (torch.abs(yt))**p
+    xp = (torch.abs(xt))**pp
+    yp = (torch.abs(yt))**pp
     zp = (torch.abs(zt))**(2.0 / s1)
 
     xyp = (xp + yp)**(s2 / s1)

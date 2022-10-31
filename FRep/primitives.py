@@ -1,4 +1,3 @@
-#import numpy as np
 import torch
 import math
 
@@ -324,7 +323,7 @@ def convLine(p, begin, end, S, T):
 
     f = 0.0
 
-    # the number of primitive
+    # number of primitives
     N = len(S)
     for n in range(0, N):
         l = torch.sqrt((end[3 * n] - begin[3 * n])**2 +
@@ -334,7 +333,7 @@ def convLine(p, begin, end, S, T):
         if l == 0.0:
             return 0
 
-        # normalized vector from beginnig to ending  Point
+        # normalized vector 
         ax = (end[3 * n] - begin[3 * n]) / l
         ay = (end[3 * n + 1] - begin[3 * n + 1]) / l
         az = (end[3 * n + 2] - begin[3 * n + 2]) / l
@@ -379,7 +378,7 @@ def convCurve(p, vect, S, T):
 
     f = 0.0
 
-    # the number of primitive
+    # number of primitives
     N = len(S)
     for n in range(0, N):
         l = torch.sqrt((vect[3 * (n + 1)] - vect[3 * n])**2 +
@@ -389,7 +388,7 @@ def convCurve(p, vect, S, T):
         if l == 0.0:
             return 0
 
-        # normalized vector from beginnig to ending point
+        # normalized vector
         ax = (vect[3 * (n + 1)] - vect[3 * n]) / l
         ay = (vect[3 * (n + 1) + 1] - vect[3 * n + 1]) / l
         az = (vect[3 * (n + 1) + 2] - vect[3 * n + 2]) / l
@@ -425,7 +424,7 @@ def convLineR(p, begin, end, S, R):
                  R - width of primitive
     '''
 
-    # the number of primitive
+    # number of primitives
     N = len(end)
     N = int(N / 3)  # or N//3
 
@@ -453,7 +452,7 @@ def convLineR(p, begin, end, S, R):
         if l == 0.0:
             return 0.0
 
-        # normalized vector from beginnig to ending  Point
+        # normalized vector
         ax = (end[3 * n] - begin[3 * n]) / l
         ay = (end[3 * n + 1] - begin[3 * n + 1]) / l
         az = (end[3 * n + 2] - begin[3 * n + 2]) / l
@@ -477,17 +476,10 @@ def convLineR(p, begin, end, S, R):
         f_tmp = xx / (2.0 * p * p * (p * p + S * S * xx * xx)) + (l - xx) / (2.0 * p * p * q2) + \
                 (torch.atan(S * xx / p) + torch.atan(S * (l - xx) / p)) / (2.0 * S * p * p * p)
 
-        #  if f < 1.0:
-
         lt1 = f < 1.0
         f[lt1] = f[lt1] + f_tmp[lt1]
         gt1 = f > 1.0
         f[gt1] = 1.0
-
-        # if torch.lt(f,1.0).all():
-        #     f = f + f_tmp
-        #     if torch.gt(f,1.0).all():
-        #         f = 1.0
 
     return f - T
 
@@ -505,9 +497,6 @@ def convTriangle(p, vect, S, T):
     '''
 
     length = [0, 0, 0]
-    # length[0] means distance of coordinates 1 and 2
-    # length[1] means distance of coordinates 2 and 3
-    # length[2] means distance of coordinates 3 and 1
 
     if not torch.is_tensor(vect):
         vect = torch.tensor(vect)
@@ -518,7 +507,7 @@ def convTriangle(p, vect, S, T):
 
     f = 0.0
 
-    # the number of primitive
+    # number of primitives 
     N = len(S)
     for n in range(N):
         a1x = vect[9 * n]
@@ -652,9 +641,6 @@ def convMesh(p, vect, tri, S, T):
     '''
 
     length = [0, 0, 0]
-    # length[0] means distance of coordinates 1 and 2
-    # length[1] means distance of coordinates 2 and 3
-    # length[2] means distance of coordinates 3 and 1
 
     if not torch.is_tensor(vect):
         vect = torch.tensor(vect)
@@ -665,10 +651,10 @@ def convMesh(p, vect, tri, S, T):
 
     f = 0.0
 
-    # the number of primitive
+    # number of primitives 
     N = len(S)
     for n in range(N):
-        #triangle coodinates
+        # triangle coodinates
         a1x = vect[3 * (tri[3 * n] - 1)]
         a1y = vect[3 * (tri[3 * n] - 1) + 1]
         a1z = vect[3 * (tri[3 * n] - 1) + 2]
@@ -820,7 +806,6 @@ def convArc(p, center, radius, theta, axis, angle, S, T):
     if not torch.is_tensor(S):
         S = torch.tensor(S)
 
-    #PI = 3.141592
     PI = math.pi
     rd = PI / 180.0
     over_i = 0.0
@@ -835,7 +820,7 @@ def convArc(p, center, radius, theta, axis, angle, S, T):
 
     f = torch.zeros_like(X)
 
-    # the number of primitive
+    # number of primitives 
     N = len(S)
     for n in range(N):
         cx = center[3 * n]  # center of arc
@@ -843,24 +828,17 @@ def convArc(p, center, radius, theta, axis, angle, S, T):
         cz = center[3 * n + 2]
 
         r = radius[n]
-        angle[n] += EPS  # avoid error
+        angle[n] += EPS  
 
-        i = axis[3 * n] + EPS  # avoid error
-        j = axis[3 * n + 1] + EPS  # avoid error
-        k = axis[3 * n + 2] + EPS  # avoid error
-
-        # if not torch.is_tensor(i):
-        #     i = torch.tensor(i)
-        # if not torch.is_tensor(j):
-        #     j = torch.tensor(j)
-        # if not torch.is_tensor(k):
-        #     k = torch.tensor(k)
+        i = axis[3 * n] + EPS  
+        j = axis[3 * n + 1] + EPS  
+        k = axis[3 * n + 2] + EPS  
 
         length = torch.sqrt(i * i + j * j + k * k)
         if length < EPS:
             length = EPS
 
-        i /= length  # calculate normal vector around which arc rotates
+        i /= length  
         j /= length
         k /= length
 
@@ -882,7 +860,6 @@ def convArc(p, center, radius, theta, axis, angle, S, T):
         if theta[n] > 360.0:
             theta[n] = 360.0
 
-        # [Begin] over PI operation
         if theta[n] > 180.0:
             over_th = (theta[n] - 180.0) * rd
             theta[n] = 180.0
@@ -895,7 +872,6 @@ def convArc(p, center, radius, theta, axis, angle, S, T):
             tempz = (-js + ki * one_c) * (X - cx) + (is_ + jk * one_c) * (
                 Y - cy) + (c + kk * one_c) * (Z - cz)
 
-            # [Begin] rotate -PI operation
             #over_c = torch.cos(rd * (-180.0))
             over_c = math.cos(rd * (-180.0))
             #over_s = torch.sin(rd * (-180.0))
@@ -921,7 +897,6 @@ def convArc(p, center, radius, theta, axis, angle, S, T):
             over_z = (-1 * over_js + over_ki * over_one_c) * (tempx) + (
                 over_is + over_jk * over_one_c) * (tempy) + (
                     over_c + over_kk * over_one_c) * (tempz)
-            # [End] rotate -PI operation
 
             a = 2.0 * r * S[n] * S[n]
             d2 = (over_x)**2 + (over_y)**2 + (over_z)**2
@@ -929,11 +904,6 @@ def convArc(p, center, radius, theta, axis, angle, S, T):
             p2 = -1 * (r)**4 * (S[n])**4 + 2.0 * (r)**2 * (S[n])**2 * (
                 (S[n])**2 * (d2 - 2.0 *
                              (over_z)**2) - 1.0) - (1.0 + (S[n])**2 * d2)**2
-
-            # if p2 < 0.0:
-            #     p1 = torch.sqrt(-1*p2)
-            # else:
-            #     p1 = torch.sqrt(p2);
 
             p1 = p2
             p2neg_idx = p2 < 0.0
@@ -947,11 +917,6 @@ def convArc(p, center, radius, theta, axis, angle, S, T):
                 (over_y)**2) * torch.sin(over_th) - b * over_y) / (
                     over_x * p2 * (a * (over_x * torch.cos(over_th) +
                                         over_y * torch.sin(over_th)) - b))
-
-            # if torch.lt(p2, 0.0).all():
-            #     f2 = 2.0 * b * (torch.atan(-a * over_y / p1) + torch.atan((a * over_y - (a * over_x + b) * torch.tan(over_th / 2.0)) / p1)) / p3;
-            # else:
-            #     f2 = 2.0 * b * (torch.atanh(a * over_y / p1) + torch.atanh(((a * over_x + b) * torch.tan(over_th / 2.0) - a * over_y) / p1)) / p3;
 
             f2 = f1
             f2[p2neg_idx] = 2.0 * b[p2neg_idx] * (torch.atan(
@@ -967,8 +932,7 @@ def convArc(p, center, radius, theta, axis, angle, S, T):
 
             f += f1 + f2
 
-
-#-------------
+        #-------------
         th = theta[n] * rd
         new_x = (c + ii * one_c) * (X - cx) + (-1.0 * ks + ij * one_c) * (
             Y - cy) + (js + ki * one_c) * (Z - cz)
@@ -984,11 +948,6 @@ def convArc(p, center, radius, theta, axis, angle, S, T):
             (S[n])**2 * (d2 - 2.0 * (new_z)**2) - 1.0) - (1.0 +
                                                           (S[n])**2 * d2)**2
 
-        # if torch.lt(p2, 0.0).all():
-        #     p1 =  torch.sqrt(-1*p2)
-        # else:
-        #     p1 = torch.sqrt(p2);
-
         p1 = p2
         p2neg_idx = p2 < 0.0
         p1[p2neg_idx] = torch.sqrt(-1.0 * p2[p2neg_idx])
@@ -1000,11 +959,6 @@ def convArc(p, center, radius, theta, axis, angle, S, T):
             (new_x)**2 + (new_y)**2) * torch.sin(th) - b * new_y) / (
                 new_x * p2 *
                 (a * (new_x * torch.cos(th) + new_y * torch.sin(th)) - b))
-
-        # if torch.lt(p2, 0.0).all():
-        #     f2 = 2.0 * b * (torch.atan(-a * new_y / p1) + torch.atan((a * new_y - (a * new_x + b) * torch.tan(th / 2.0)) / p1)) / p3;
-        # else:
-        #     f2 = 2.0 * b * (torch.atanh(a * new_y / p1) + torch.atanh(((a * new_x + b) * torch.tan(th / 2.0) - a * new_y) / p1)) / p3;
 
         f2 = f1
         f2[p2neg_idx] = 2.0 * b[p2neg_idx] * (

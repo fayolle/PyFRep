@@ -14,7 +14,7 @@ import polyscope as ps
 
 def model(p):
     R = 10.0
-    f_dist = sdSphere(p, R)
+    f_dist = sdSphere(p, center=(0.0,0.0,0.0), r=R)
     offset = 0.5
     f_shell = shell(f_dist, offset)
 

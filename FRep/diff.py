@@ -14,7 +14,7 @@ def grad(y, x):
     return g
 
 
-def fun_grad(f, x):
+def funGrad(f, x):
     '''
     Given a function f, and a variable x, compute y = f(x) and g = grad(f)(x).
     Return (y, g)

@@ -96,7 +96,7 @@ def blobby(p, x0, y0, z0, a, b, T):
     return s - T
 
 
-def metaBall(p, p0, y0, z0, b, d, T):
+def metaBall(p, x0, y0, z0, b, d, T):
     s = torch.zeros((p.shape[0], 1))
     for i in range(len(x0)):
         xx0 = p[:, 0] - x0[i]

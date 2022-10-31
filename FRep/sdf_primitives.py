@@ -216,7 +216,7 @@ def cylinder(x, center, u, r):
     cp = torch.cross(ub, cmx)
 
     d1 = cp[:, 0]**2 + cp[:, 1]**2 + cp[:, 2]**2
-    d2 = u[0]**2 + u[0]**2 + u[2]**2
+    d2 = u[0]**2 + u[1]**2 + u[2]**2
 
     d = d1 / d2
     d = torch.sqrt(d)

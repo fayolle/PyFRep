@@ -8,14 +8,12 @@ import polyscope as ps
 
 
 def model(p):
-    sp1 = sphere(p, r=1)
+    sp1 = sphere(p, center=(0.0,0.0,0.0), r=1)
     b1 = box(p, b=1.5)
     t1 = intersection(sp1, b1)
-    p1 = orient(p, (1.0, 0.0, 0.0))
-    c1 = cylinder(p1, r=0.5)
-    p2 = orient(p, (0.0, 1.0, 0.0))
-    c2 = cylinder(p2, r=0.5)
-    c3 = cylinder(p, r=0.5)
+    c1 = cylinder(p, center=(0.0,0.0,0.0), u=(1.0,0.0,0.0), r=0.5)
+    c2 = cylinder(p, center=(0.0,0.0,0.0), u=(0.0,1.0,0.0), r=0.5)
+    c3 = cylinder(p, center=(0.0,0.0,0.0), u=(0.0,0.0,1.0), r=0.5)
     t2 = difference(t1, c1)
     t3 = difference(t2, c2)
     t4 = difference(t3, c3)

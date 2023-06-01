@@ -1028,3 +1028,50 @@ def superQuadric(p, e, a, r, t):
 
     return f
 
+
+def spinodoid(p, wavenumber, numwaves, density):
+    '''
+    Spinodoid topology
+
+    S. Kumar, S. Tan, L. Zheng, D.M. Kochmann. Inverse-designed spinodoid metamaterials.
+    '''
+
+    beta = wavenumber
+
+    N = numwaves
+    if not torch.is_tensor(N):
+        N = torch.tensor(N)
+        
+    rho = density
+    if not torch.is_tensor(rho):
+        rho = torch.tensor(rho)
+
+    # Sample n_i on the unit sphere S2
+    n = torch.randn(N, 3)
+    nx = n[:,0]
+    ny = n[:,1]
+    nz = n[:,2]
+    l2 = nx**2 + ny**2 + nz**2
+    nx = nx / torch.sqrt(l2)
+    ny = ny / torch.sqrt(l2)
+    nz = nz / torch.sqrt(l2)
+
+    # Phases 
+    g = 2.0*math.pi*torch.rand(N)
+
+    phi = torch.zeros(p.shape[0])
+    for i in range(N):
+        x = p[:,0]
+        y = p[:,1]
+        z = p[:,2]
+
+        np = nx[i]*x + ny[i]*y + nz[i]*z
+        phi = phi + torch.sqrt(2.0/N)*torch.cos(np*beta + g[i])
+
+    # Compute the level-set from the relative density
+    ls = math.sqrt(2.0)*torch.special.erfinv(2*rho - 1)
+
+    f = phi - ls 
+
+    return f
+

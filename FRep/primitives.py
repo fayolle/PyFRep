@@ -1046,6 +1046,7 @@ def spinodoid(p, wavenumber, numwaves, density):
     if not torch.is_tensor(rho):
         rho = torch.tensor(rho)
 
+        
     # Sample n_i on the unit sphere S2
     n = torch.randn(N, 3)
     nx = n[:,0]
@@ -1056,6 +1057,7 @@ def spinodoid(p, wavenumber, numwaves, density):
     ny = ny / torch.sqrt(l2)
     nz = nz / torch.sqrt(l2)
 
+    
     # Phases 
     g = 2.0*math.pi*torch.rand(N)
 
@@ -1067,6 +1069,7 @@ def spinodoid(p, wavenumber, numwaves, density):
 
         np = nx[i]*x + ny[i]*y + nz[i]*z
         phi = phi + torch.sqrt(2.0/N)*torch.cos(np*beta + g[i])
+
 
     # Compute the level-set from the relative density
     ls = math.sqrt(2.0)*torch.special.erfinv(2*rho - 1)

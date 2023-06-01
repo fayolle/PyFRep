@@ -974,3 +974,57 @@ def convArc(p, center, radius, theta, axis, angle, S, T):
         f += f1 + f2
 
     return f - T
+
+
+def superQuadric(p, e, a, r, t):
+    '''
+    Super quadric
+    p: eval point
+    e = (e1,e2): exponents
+    a = (ax, ay, az): scaling factors
+    r = (r1, r2, r3): Euler angles
+    t = (tx, ty, tz): translation vector
+    '''
+
+    
+    # ---------------------------------
+    def eul2rotm(r):
+        '''
+        Form a rotation matrix from the Euler angles r[0], r[1], r[2]
+        '''
+        R = torch.zeros((3,3))
+        ct = torch.cos(r)
+        st = torch.sin(r)
+
+        R[0,0] = ct[0]*ct[1]
+        R[0,1] = ct[0]*st[1]*st[2] - st[0]*ct[2]
+        R[0,2] = ct[0]*st[1]*ct[2] + st[0]*st[2]
+
+        R[1,0] = st[0]*ct[1]
+        R[1,1] = st[0]*st[1]*st[2] + ct[0]*ct[2]
+        R[1,2] = st[0]*st[1]*ct[2] - ct[0]*st[2]
+
+        R[2,0] = -st[1]
+        R[2,1] = ct[1]*st[2]
+        R[2,2] = ct[1]*ct[2]
+        
+        return R    
+    # ---------------------------------
+
+    
+    if not torch.is_tensor(r):
+        r = torch.tensor(r)
+    
+    R = eul2rotm(r)
+    
+    if not torch.is_tensor(t):
+        t = torch.tensor(t)
+    t = t.reshape((3,1))
+
+    P = R.T @ p.T - R.T @ t
+    P = P.T
+
+    f = 1.0 - (((P[:,0]/a[0])**(2/e[1]) + (P[:,1]/a[1])**(2/e[1]))**(e[1]/e[0]) + (P[:,2]/a[2])**(2/e[0]))
+
+    return f
+

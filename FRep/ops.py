@@ -267,9 +267,17 @@ def boundBlendUnion(f1, f2, f3, a0, a1, a2, a3):
 def sawtooth(p, T):
     if not torch.is_tensor(T):
         T = torch.tensor(T)
-    return 2.0 * (0.5 -
-                  torch.atan(1.0 / torch.tan(math.pi *
-                                             (p / T - 0.5))) / math.pi) - 1.0
+    
+    arg = math.pi * (p / T - 0.5)
+    tan_arg = torch.tan(arg)
+    
+    # Avoid division by zero when tan is very close to zero
+    eps = 1e-7
+    tan_arg = torch.where(torch.abs(tan_arg) < eps, 
+                          torch.sign(tan_arg) * eps, 
+                          tan_arg)
+    
+    return 2.0 * (0.5 - torch.atan(1.0 / tan_arg) / math.pi) - 1.0
 
 
 # T is the period of the triangle wave

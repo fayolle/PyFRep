@@ -85,7 +85,7 @@ def block(p, vertex, dx, dy, dz):
 
 
 def blobby(p, x0, y0, z0, a, b, T):
-    s = 0.0
+    s = torch.zeros(p.shape[0])
     for i in range(len(x0)):
         xx0 = p[:, 0] - x0[i]
         xx1 = p[:, 1] - y0[i]
@@ -96,7 +96,7 @@ def blobby(p, x0, y0, z0, a, b, T):
 
 
 def metaBall(p, x0, y0, z0, b, d, T):
-    s = torch.zeros((p.shape[0], 1))
+    s = torch.zeros(p.shape[0])
     for i in range(len(x0)):
         xx0 = p[:, 0] - x0[i]
         xx1 = p[:, 1] - y0[i]
@@ -105,14 +105,14 @@ def metaBall(p, x0, y0, z0, b, d, T):
 
         idx1 = (r <= d[i] / 3.0)
         idx2 = (r <= d[i]) & ~idx1
-        s[idx1] = s[idx1] + b[i] * (1.0 - 3.0 * r / d[i] * d[i])
-        s[idx2] = s[idx2] + 1.5 * b[i] * (1.0 - r / d[i])**2
+        s[idx1] = s[idx1] + b[i] * (1.0 - 3.0 * r[idx1] / d[i] * d[i])
+        s[idx2] = s[idx2] + 1.5 * b[i] * (1.0 - r[idx2] / d[i])**2
 
     return s - T
 
 
 def soft(p, x0, y0, z0, d, T):
-    s = torch.zeros((p.shape[0], 1))
+    s = torch.zeros(p.shape[0])
     for i in range(len(x0)):
         xx0 = p[:, 0] - x0[i]
         xx1 = p[:, 1] - y0[i]

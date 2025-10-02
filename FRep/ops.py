@@ -8,7 +8,7 @@ def scale(p, factor):
         x, y, z = factor
     except TypeError:
         x = y = z = factor
-    s = torch.tensor((x, y, z))
+    s = torch.tensor((x, y, z), dtype=p.dtype, device=p.device)
     return (p / s)
 
 
@@ -74,12 +74,12 @@ def negate(d1):
 
 
 def scale3D(p, sx, sy, sz):
-    s = torch.tensor((sx, sy, sz))
+    s = torch.tensor((sx, sy, sz), dtype=p.dtype, device=p.device)
     return (p / s)
 
 
 def shift3D(p, dx, dy, dz):
-    return p - torch.tensor((dx, dy, dz))
+    return p - torch.tensor((dx, dy, dz), dtype=p.dtype, device=p.device)
 
 
 def translate(p, offset):
@@ -88,7 +88,7 @@ def translate(p, offset):
 
 def rotate3DX(p, theta):
     if not torch.is_tensor(theta):
-        theta = torch.tensor(theta)
+        theta = torch.tensor(theta, dtype=p.dtype, device=p.device)
     p2 = p.clone()
     p2[:, 1] = p[:, 1] * torch.cos(theta) + p[:, 2] * torch.sin(theta)
     p2[:, 2] = -p[:, 1] * torch.sin(theta) + p[:, 2] * torch.cos(theta)
@@ -97,7 +97,7 @@ def rotate3DX(p, theta):
 
 def rotate3DY(p, theta):
     if not torch.is_tensor(theta):
-        theta = torch.tensor(theta)
+        theta = torch.tensor(theta, dtype=p.dtype, device=p.device)
     p2 = p.clone()
     p2[:, 2] = p[:, 2] * torch.cos(theta) + p[:, 0] * torch.sin(theta)
     p2[:, 0] = -p[:, 2] * torch.sin(theta) + p[:, 0] * torch.cos(theta)
@@ -106,7 +106,7 @@ def rotate3DY(p, theta):
 
 def rotate3DZ(p, theta):
     if not torch.is_tensor(theta):
-        theta = torch.tensor(theta)
+        theta = torch.tensor(theta, dtype=p.dtype, device=p.device)
     p2 = p.clone()
     p2[:, 0] = p[:, 0] * torch.cos(theta) + p[:, 1] * torch.sin(theta)
     p2[:, 1] = -p[:, 0] * torch.sin(theta) + p[:, 1] * torch.cos(theta)
@@ -115,7 +115,7 @@ def rotate3DZ(p, theta):
 
 def rotate(p, angle, vector=(0.0, 0.0, 1.0)):
     if (not torch.is_tensor(vector)):
-        vector = torch.tensor(vector)
+        vector = torch.tensor(vector, dtype=p.dtype, device=p.device)
     x, y, z = _normalize(vector)
     s = torch.sin(angle)
     c = torch.cos(angle)
@@ -133,8 +133,8 @@ def rotate(p, angle, vector=(0.0, 0.0, 1.0)):
     
 # Transform such that (0,0,1) becomes v
 def orient(p, v):
-    v = torch.tensor(v)
-    v1 = torch.tensor((0.0, 0.0, 1.0))
+    v = torch.tensor(v, dtype=p.dtype, device=p.device)
+    v1 = torch.tensor((0.0, 0.0, 1.0), dtype=p.dtype, device=p.device)
     v = _normalize(v)
     d = torch.dot(v1, v)
     d = torch.clamp(d, -1.0, 1.0)
@@ -252,7 +252,7 @@ def taperZ(p, z1, z2, s1, s2):
 
 def rep(p, c):
     if not torch.is_tensor(c):
-        c = torch.tensor(c)
+        c = torch.tensor(c, dtype=p.dtype, device=p.device)
     q = torch.fmod(p + 0.5 * c, c) - 0.5 * c
     # or
     #q = torch.remainder(p + 0.5*c, c)-0.5*c
@@ -278,7 +278,7 @@ def boundBlendUnion(f1, f2, f3, a0, a1, a2, a3):
 # Output is in [-1,1]
 def sawtooth(p, T):
     if not torch.is_tensor(T):
-        T = torch.tensor(T)
+        T = torch.tensor(T, dtype=p.dtype, device=p.device)
     
     arg = math.pi * (p / T - 0.5)
     tan_arg = torch.tan(arg)
@@ -296,5 +296,5 @@ def sawtooth(p, T):
 # Output is in [-1,1]
 def triangleWave(p, T):
     if not torch.is_tensor(T):
-        T = torch.tensor(T)
+        T = torch.tensor(T, dtype=p.dtype, device=p.device)
     return 2.0 / math.pi * torch.asin(torch.sin(math.pi * (2.0 * p / T - 0.5)))

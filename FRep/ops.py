@@ -178,7 +178,7 @@ def twistY(p, y1, y2, theta1, theta2):
 
 def twistZ(p, z1, z2, theta1, theta2):
     p2 = p.clone()
-    t = (p[:, 1] - z1) / (z2 - z1)
+    t = (p[:, 2] - z1) / (z2 - z1)
     theta = (1.0 - t) * theta1 + t * theta2
     p2[:, 0] = p[:, 0] * torch.cos(theta) + p[:, 1] * torch.sin(theta)
     p2[:, 1] = -p[:, 0] * torch.sin(theta) + p[:, 1] * torch.cos(theta)

@@ -148,7 +148,8 @@ def orient(p, v):
         return rotate(p, math.pi, vector=(1.0, 0.0, 0.0))
     
     a = torch.arccos(d)
-    v2 = torch.cross(v1, v)
+    #v2 = torch.cross(v1, v)
+    v2 = torch.linalg.cross(v1, v)
     v2 = _normalize(v2)
     
     return rotate(p, a, v2)

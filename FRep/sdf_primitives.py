@@ -213,7 +213,8 @@ def cylinder(x, center, u, r):
     # broadcast for the cross-product
     ub = torch.zeros_like(cmx)
     ub[:] = u
-    cp = torch.cross(ub, cmx)
+    #cp = torch.cross(ub, cmx)
+    cp = torch.linalg.cross(ub, cmx)
 
     d1 = cp[:, 0]**2 + cp[:, 1]**2 + cp[:, 2]**2
     d2 = u[0]**2 + u[1]**2 + u[2]**2

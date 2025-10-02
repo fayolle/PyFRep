@@ -125,7 +125,8 @@ def rotate(p, angle, vector=(0.0, 0.0, 1.0)):
         [m * x * y - z * s, m * y * y + c, m * y * z + x * s],
         [m * z * x + y * s, m * y * z - x * s, m * z * z + c],
     ])
-    torch.t(matrix)
+    #torch.t(matrix)
+    matrix = matrix.T
     return torch.matmul(p, matrix)
     #return torch.dot(p, matrix)
 

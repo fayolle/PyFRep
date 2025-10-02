@@ -272,9 +272,9 @@ def convPoint(p, vect, S, T):
     '''
 
     if not torch.is_tensor(vect):
-        vect = torch.tensor(vect)
+        vect = torch.tensor(vect, dtype=p.dtype, device=p.device)
     if not torch.is_tensor(S):
-        S = torch.tensor(S)
+        S = torch.tensor(S, dtype=p.dtype, device=p.device)
 
     X = p[:, 0]
     Y = p[:, 1]
@@ -309,13 +309,13 @@ def convLine(p, begin, end, S, T):
     '''
 
     if not torch.is_tensor(begin):
-        begin = torch.tensor(begin)
+        begin = torch.tensor(begin, dtype=p.dtype, device=p.device)
 
     if not torch.is_tensor(end):
-        end = torch.tensor(end)
+        end = torch.tensor(end, dtype=p.dtype, device=p.device)
 
     if not torch.is_tensor(S):
-        S = torch.tensor(S)
+        S = torch.tensor(S, dtype=p.dtype, device=p.device)
 
     X = p[:, 0]
     Y = p[:, 1]
@@ -370,7 +370,7 @@ def convCurve(p, vect, S, T):
     '''
 
     if not torch.is_tensor(vect):
-        vect = torch.tensor(vect)
+        vect = torch.tensor(vect, dtype=p.dtype, device=p.device)
 
     X = p[:, 0]
     Y = p[:, 1]
@@ -429,10 +429,10 @@ def convLineR(p, begin, end, S, R):
     N = int(N / 3)  # or N//3
 
     if not torch.is_tensor(begin):
-        begin = torch.tensor(begin)
+        begin = torch.tensor(begin, dtype=p.dtype, device=p.device)
 
     if not torch.is_tensor(end):
-        end = torch.tensor(end)
+        end = torch.tensor(end, dtype=p.dtype, device=p.device)
 
     X = p[:, 0]
     Y = p[:, 1]
@@ -499,7 +499,7 @@ def convTriangle(p, vect, S, T):
     length = [0, 0, 0]
 
     if not torch.is_tensor(vect):
-        vect = torch.tensor(vect)
+        vect = torch.tensor(vect, dtype=p.dtype, device=p.device)
 
     X = p[:, 0]
     Y = p[:, 1]
@@ -643,7 +643,7 @@ def convMesh(p, vect, tri, S, T):
     length = [0, 0, 0]
 
     if not torch.is_tensor(vect):
-        vect = torch.tensor(vect)
+        vect = torch.tensor(vect, dtype=p.dtype, device=p.device)
 
     X = p[:, 0]
     Y = p[:, 1]
@@ -789,22 +789,22 @@ def convArc(p, center, radius, theta, axis, angle, S, T):
     '''
 
     if not torch.is_tensor(center):
-        center = torch.tensor(center)
+        center = torch.tensor(center, dtype=p.dtype, device=p.device)
 
     if not torch.is_tensor(radius):
-        radius = torch.tensor(radius)
+        radius = torch.tensor(radius, dtype=p.dtype, device=p.device)
 
     if not torch.is_tensor(theta):
-        theta = torch.tensor(theta)
+        theta = torch.tensor(theta, dtype=p.dtype, device=p.device)
 
     if not torch.is_tensor(axis):
-        axis = torch.tensor(axis)
+        axis = torch.tensor(axis, dtype=p.dtype, device=p.device)
 
     if not torch.is_tensor(angle):
-        angle = torch.tensor(angle)
+        angle = torch.tensor(angle, dtype=p.dtype, device=p.device)
 
     if not torch.is_tensor(S):
-        S = torch.tensor(S)
+        S = torch.tensor(S, dtype=p.dtype, device=p.device)
 
     PI = math.pi
     rd = PI / 180.0
@@ -1013,12 +1013,12 @@ def superQuadric(p, e, a, r, t):
 
     
     if not torch.is_tensor(r):
-        r = torch.tensor(r)
+        r = torch.tensor(r, dtype=p.dtype, device=p.device)
     
     R = eul2rotm(r)
     
     if not torch.is_tensor(t):
-        t = torch.tensor(t)
+        t = torch.tensor(t, dtype=p.dtype, device=p.device)
     t = t.reshape((3,1))
 
     P = R.T @ p.T - R.T @ t
@@ -1040,11 +1040,11 @@ def spinodoid(p, wavenumber, numwaves, density):
 
     N = numwaves
     if not torch.is_tensor(N):
-        N = torch.tensor(N)
+        N = torch.tensor(N, dtype=p.dtype, device=p.device)
         
     rho = density
     if not torch.is_tensor(rho):
-        rho = torch.tensor(rho)
+        rho = torch.tensor(rho, dtype=p.dtype, device=p.device)
 
         
     # Sample n_i on the unit sphere S2

@@ -261,13 +261,6 @@ def torusZ(x, center, R, r0):
     return -dxyz
 
 
-def plane(p, n, h):
-    if not torch.is_tensor(n):
-        n = torch.tensor(n)
-
-    return -(p[:,0]*n[:,0] + p[:,1]*n[:,1] + p[:,2]*n[:,2] + h)
-
-
 def frame(p, side_length, thickness):
     if not torch.is_tensor(side_length):
         side_length = torch.tensor(side_length)

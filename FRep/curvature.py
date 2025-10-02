@@ -11,7 +11,7 @@ def meanCurvature(f, v):
     if not torch.is_tensor(v):
         # array.copy() is to prevent the case
         # where the numpy array has a negative stride
-        vt = torch.tensor(v.copy())
+        vt = torch.tensor(v.copy(), dtype=f.dtype, device=f.device)
     else:
         vt = v
 
@@ -40,7 +40,7 @@ def GaussianCurvature(f, v):
     if not torch.is_tensor(v):
         # array.copy() is to prevent the case
         # where the numpy array has a negative stride
-        vt = torch.tensor(v.copy())
+        vt = torch.tensor(v.copy(), dtype=f.dtype, device=f.device)
     else:
         vt = v
 
@@ -57,7 +57,7 @@ def GaussianCurvature(f, v):
     grad_ft = grad_ft.reshape((grad_ft.shape[0], grad_ft.shape[1], 1))
 
     # Hessian
-    H_ft = torch.zeros((v.shape[0], 3, 3))
+    H_ft = torch.zeros((v.shape[0], 3, 3), dtype=f.dtype, device=f.device)
     tmp0 = grad(grad_ft[:, 0], vt)
     H_ft[:, 0, 0] = tmp0[:, 0]
     H_ft[:, 0, 1] = tmp0[:, 1]

@@ -130,15 +130,27 @@ def rotate(p, angle, vector=(0.0, 0.0, 1.0)):
     return torch.matmul(p, matrix)
     #return torch.dot(p, matrix)
 
-
+    
 # Transform such that (0,0,1) becomes v
 def orient(p, v):
     v = torch.tensor(v)
     v1 = torch.tensor((0.0, 0.0, 1.0))
     v = _normalize(v)
     d = torch.dot(v1, v)
+    d = torch.clamp(d, -1.0, 1.0)
+
+    eps = 1e-7
+    
+    # Check for parallel vectors 
+    if torch.abs(d - 1.0) < eps:
+        return p
+    elif torch.abs(d + 1.0) < eps:
+        return rotate(p, math.pi, vector=(1.0, 0.0, 0.0))
+    
     a = torch.arccos(d)
-    v2 = torch.cross(v, v1)
+    v2 = torch.cross(v1, v)
+    v2 = _normalize(v2)
+    
     return rotate(p, a, v2)
 
 

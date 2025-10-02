@@ -299,7 +299,7 @@ def superQuadric(p, e, a, r, t):
         '''
         Form a rotation matrix from the Euler angles r[0], r[1], r[2]
         '''
-        R = torch.zeros((3,3))
+        R = torch.zeros((3,3), dtype=r.dtype, device=r.device)
         ct = torch.cos(r)
         st = torch.sin(r)
 

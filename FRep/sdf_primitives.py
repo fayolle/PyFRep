@@ -6,15 +6,15 @@ from .utils import _normalize, _dot, _vec
 
 def sphere(p, center, r):
     if not torch.is_tensor(center):
-        center = torch.tensor(center)
+        center = torch.tensor(center, dtype=p.dtype, device=p.device)
     return r - _length(p - center)
 
 
 def plane(p, normal=(0.0, 0.0, 1.0), point=(0.0, 0.0, 0.0)):
     if not torch.is_tensor(normal):
-        normal = torch.tensor(normal)
+        normal = torch.tensor(normal, dtype=p.dtype, device=p.device)
     if not torch.is_tensor(point):
-        point = torch.tensor(point)
+        point = torch.tensor(point, dtype=p.dtype, device=p.device)
 
     normal = _normalize(normal)
     return -torch.dot(point - p, normal)
@@ -22,7 +22,7 @@ def plane(p, normal=(0.0, 0.0, 1.0), point=(0.0, 0.0, 0.0)):
 
 def box(p, b):
     if not torch.is_tensor(b):
-        b = torch.tensor(b)
+        b = torch.tensor(b, dtype=p.dtype, device=p.device)
     q = torch.abs(p) - b
     z = torch.zeros_like(q)
     t1 = _length(_max(q, z))
@@ -37,7 +37,7 @@ def box(p, b):
 
 def roundedBox(p, b, radius):
     if not torch.is_tensor(b):
-        b = torch.tensor(b)
+        b = torch.tensor(b, dtype=p.dtype, device=p.device)
     q = torch.abs(p) - b
     z = torch.zeros_like(q)
     t1 = _length(_max(q, z))
@@ -58,9 +58,9 @@ def torus(p, r1, r2):
 
 def capsule(p, a, b, radius):
     if not torch.is_tensor(a):
-        a = torch.tensor(a)
+        a = torch.tensor(a, dtype=p.dtype, device=p.device)
     if not torch.is_tensor(b):
-        b = torch.tensor(b)
+        b = torch.tensor(b, dtype=p.dtype, device=p.device)
     pa = p - a
     ba = b - a
     h = torch.clip(torch.dot(pa, ba) / torch.dot(ba, ba), 0.0, 1.0).reshape(
@@ -70,27 +70,27 @@ def capsule(p, a, b, radius):
 
 def cylinderX(p, center, r):
     if not torch.is_tensor(center):
-        center = torch.tensor(center)
+        center = torch.tensor(center, dtype=p.dtype, device=p.device)
     return r - _length(p[:, [1, 2]] - center[[1, 2]])
 
 
 def cylinderY(p, center, r):
     if not torch.is_tensor(center):
-        center = torch.tensor(center)
+        center = torch.tensor(center, dtype=p.dtype, device=p.device)
     return r - _length(p[:, [0, 2]] - center[[0, 2]])
 
 
 def cylinderZ(p, center, r):
     if not torch.is_tensor(center):
-        center = torch.tensor(center)
+        center = torch.tensor(center, dtype=p.dtype, device=p.device)
     return r - _length(p[:, [0, 1]] - center[[0, 1]])
 
 
 def cappedCylinder(p, a, b, radius):
     if not torch.is_tensor(a):
-        a = torch.tensor(a)
+        a = torch.tensor(a, dtype=p.dtype, device=p.device)
     if not torch.is_tensor(b):
-        b = torch.tensor(b)
+        b = torch.tensor(b, dtype=p.dtype, device=p.device)
 
     ba = b - a
     pa = p - a
@@ -122,9 +122,9 @@ def cappedCylinder(p, a, b, radius):
 
 def cappedCone(p, a, b, ra, rb):
     if not torch.is_tensor(a):
-        a = torch.tensor(a)
+        a = torch.tensor(a, dtype=p.dtype, device=p.device)
     if not torch.is_tensor(b):
-        b = torch.tensor(b)
+        b = torch.tensor(b, dtype=p.dtype, device=p.device)
     rba = rb - ra
     baba = torch.dot(b - a, b - a)
     papa = _dot(p - a, p - a)
@@ -144,7 +144,7 @@ def cappedCone(p, a, b, ra, rb):
 # Primitives from the HF library
 def block(x, vertex, dx, dy, dz):
     if not torch.is_tensor(vertex):
-        vertex = torch.tensor(vertex)
+        vertex = torch.tensor(vertex, dtype=x.dtype, device=x.device)
     b = torch.tensor((dx, dy, dz))
     shift = vertex + 0.5 * b
     xt = x - shift
@@ -203,9 +203,9 @@ def coneZ(x, center, r):
 # Pass through point 'center' in direction 'u' with radius 'r'
 def cylinder(x, center, u, r):
     if not torch.is_tensor(center):
-        center = torch.tensor(center)
+        center = torch.tensor(center, dtype=x.dtype, device=x.device)
     if not torch.is_tensor(u):
-        u = torch.tensor(u)
+        u = torch.tensor(u, dtype=x.dtype, device=x.device)
 
     cu = center + u
     cmx = center - x
@@ -227,7 +227,7 @@ def cylinder(x, center, u, r):
 
 def torusX(x, center, R, r0):
     if not torch.is_tensor(center):
-        center = torch.tensor(center)
+        center = torch.tensor(center, dtype=x.dtype, device=x.device)
 
     x2 = x - center
     dyz = torch.sqrt(x2[:, 1]**2 + x2[:, 2]**2)
@@ -239,7 +239,7 @@ def torusX(x, center, R, r0):
 
 def torusY(x, center, R, r0):
     if not torch.is_tensor(center):
-        center = torch.tensor(center)
+        center = torch.tensor(center, dtype=x.dtype, device=x.device)
 
     x2 = x - center
     dxz = torch.sqrt(x2[:, 0]**2 + x2[:, 2]**2)
@@ -251,7 +251,7 @@ def torusY(x, center, R, r0):
 
 def torusZ(x, center, R, r0):
     if not torch.is_tensor(center):
-        center = torch.tensor(center)
+        center = torch.tensor(center, dtype=x.dtype, device=x.device)
 
     x2 = x - center
     dxy = torch.sqrt(x2[:, 0]**2 + x2[:, 1]**2)
@@ -263,9 +263,9 @@ def torusZ(x, center, R, r0):
 
 def frame(p, side_length, thickness):
     if not torch.is_tensor(side_length):
-        side_length = torch.tensor(side_length)
+        side_length = torch.tensor(side_length, dtype=p.dtype, device=p.device)
     if not torch.is_tensor(thickness):
-        thickness = torch.tensor(thickness)
+        thickness = torch.tensor(thickness, dtype=p.dtype, device=p.device)
 
     pt = torch.abs(p) - side_length/2.0 - thickness/2.0
     qt = torch.abs(pt + thickness/2.0) - thickness/2.0
@@ -320,12 +320,12 @@ def superQuadric(p, e, a, r, t):
 
     
     if not torch.is_tensor(r):
-        r = torch.tensor(r)
+        r = torch.tensor(r, dtype=p.dtype, device=p.device)
     
     R = eul2rotm(r)
     
     if not torch.is_tensor(t):
-        t = torch.tensor(t)
+        t = torch.tensor(t, dtype=p.dtype, device=p.device)
     t = t.reshape((3,1))
 
     P = R.T @ p.T - R.T @ t

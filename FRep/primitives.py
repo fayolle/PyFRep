@@ -85,7 +85,7 @@ def block(p, vertex, dx, dy, dz):
 
 
 def blobby(p, x0, y0, z0, a, b, T):
-    s = torch.zeros(p.shape[0])
+    s = torch.zeros(p.shape[0], dtype=dtype, device=device)
     for i in range(len(x0)):
         xx0 = p[:, 0] - x0[i]
         xx1 = p[:, 1] - y0[i]
@@ -96,7 +96,7 @@ def blobby(p, x0, y0, z0, a, b, T):
 
 
 def metaBall(p, x0, y0, z0, b, d, T):
-    s = torch.zeros(p.shape[0])
+    s = torch.zeros(p.shape[0], dtype=dtype, device=device)
     for i in range(len(x0)):
         xx0 = p[:, 0] - x0[i]
         xx1 = p[:, 1] - y0[i]
@@ -112,7 +112,7 @@ def metaBall(p, x0, y0, z0, b, d, T):
 
 
 def soft(p, x0, y0, z0, d, T):
-    s = torch.zeros(p.shape[0])
+    s = torch.zeros(p.shape[0], dtype=dtype, device=device)
     for i in range(len(x0)):
         xx0 = p[:, 0] - x0[i]
         xx1 = p[:, 1] - y0[i]
@@ -169,7 +169,8 @@ def ellConeZ(p, center, a, b):
 
 
 def mapBlob(p, fobj, x0, y0, z0, fobj0, sigma):
-    s = torch.zeros((p.shape[0], 1))
+    #s = torch.zeros((p.shape[0], 1))
+    s = torch.zeros(p.shape[0], dtype=dtype, device=device)
     s[:] = fobj
     for i in range(len(x0)):
         xt = p[:, 0] - x0[i]
@@ -992,7 +993,7 @@ def superQuadric(p, e, a, r, t):
         '''
         Form a rotation matrix from the Euler angles r[0], r[1], r[2]
         '''
-        R = torch.zeros((3,3))
+        R = torch.zeros((3,3), dtype=dtype, device=device)
         ct = torch.cos(r)
         st = torch.sin(r)
 
@@ -1061,7 +1062,7 @@ def spinodoid(p, wavenumber, numwaves, density):
     # Phases 
     g = 2.0*math.pi*torch.rand(N)
 
-    phi = torch.zeros(p.shape[0])
+    phi = torch.zeros(p.shape[0], dtype=dtype, device=device)
     for i in range(N):
         x = p[:,0]
         y = p[:,1]

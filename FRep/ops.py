@@ -208,7 +208,7 @@ def stretch3D(p, x0, sx, sy, sz):
 def taperX(p, x1, x2, s1, s2):
     p2 = p.clone()
     #scale = torch.zeros((p.shape[0], 1))
-    scale = torch.zeros(p.shape[0])
+    scale = torch.zeros(p.shape[0], dtype=dtype, device=device)
     scale[:] = s1
     idx = (p[:, 0] > x2)
     scale[idx] = s2
@@ -223,7 +223,7 @@ def taperX(p, x1, x2, s1, s2):
 def taperY(p, y1, y2, s1, s2):
     p2 = p.clone()
     #scale = torch.zeros((p.shape[0], 1))
-    scale = torch.zeros(p.shape[0])
+    scale = torch.zeros(p.shape[0], dtype=dtype, device=device)
     scale[:] = s1
     idx = (p[:, 1] > y2)
     scale[idx] = s2
@@ -238,7 +238,7 @@ def taperY(p, y1, y2, s1, s2):
 def taperZ(p, z1, z2, s1, s2):
     p2 = p.clone()
     #scale = torch.zeros((p.shape[0], 1))
-    scale = torch.zeros(p.shape[0])
+    scale = torch.zeros(p.shape[0], dtype=dtype, device=device)
     scale[:] = s1
     idx = (p[:, 2] > z2)
     scale[idx] = s2

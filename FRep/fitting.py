@@ -6,16 +6,16 @@ import random
 import copy
 
 
-def makeLossModel(model, pc):
+def makeLossModel(model, pc, dtype=torch.float32, device='cpu'):
     '''
     Wrapper such that the model can be used with Scikit optimize.
     '''
     if (not torch.is_tensor(pc)):
-        pc = torch.tensor(pc)
+        pc = torch.tensor(pc, dtype=dtype, device=device)
 
     def lossModel(param):
         if (not torch.is_tensor(param)):
-            param = torch.tensor(param)
+            param = torch.tensor(param, dtype=dtype, device=device)
 
         f = model(pc, param)
         loss = torch.mean(f**2)

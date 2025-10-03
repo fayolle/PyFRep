@@ -34,7 +34,9 @@ class Model(nn.Module):
                  lower_bound,
                  upper_bound,
                  param_init=[],
-                 device='cpu'):
+                 device='cpu',
+                 dtype=torch.float32):
+        
         super(Model, self).__init__()
 
         self._frep_model = frep_model
@@ -49,9 +51,9 @@ class Model(nn.Module):
                 xmin = lower_bound[i]
                 xmax = upper_bound[i]
                 param = torch.nn.Parameter(
-                    torch.FloatTensor(1, 1).uniform_(xmin, xmax).to(device))
+                    torch.empty(1, 1, dtype=dtype, device=device).uniform_(xmin, xmax))
             else:
-                parami = torch.FloatTensor([[param_init[i]]]).to(device)
+                parami = torch.tensor([[param_init[i]]], dtype=dtype, device=device)
                 param = torch.nn.Parameter(parami)
             self.param.append(param)
             self.register_parameter('param' + str(i), param)
@@ -67,7 +69,8 @@ def train(frep_model,
           param_init=[],
           num_iters=100,
           batch_size=1024,
-          device=torch.device('cpu')):
+          device=torch.device('cpu'),
+          dtype=torch.float32):
 
     '''
     Fit parameters of frep_model by stochastic gradient descent, 
@@ -78,13 +81,12 @@ def train(frep_model,
                   lower_bound,
                   upper_bound,
                   param_init=param_init,
-                  device=device)
+                  device=device,
+                  dtype=dtype)
     optimizer = torch.optim.Adam(model.parameters(), lr=0.0001)
 
     if (not torch.is_tensor(point_cloud)):
-        point_cloud = torch.tensor(point_cloud)
-        # point_cloud = point_cloud.float().to(device)
-        point_cloud = point_cloud.to(device)
+        point_cloud = torch.tensor(point_cloud, device=device, dtype=dtype)
 
     for i in range(0, num_iters):
         batches = torch.utils.data.DataLoader(point_cloud,
@@ -113,11 +115,11 @@ def train(frep_model,
 # See Algorithm 1 in https://arxiv.org/pdf/1802.01548.pdf
 
 class Evaluator(object):
-    def __init__(self, model_f, pc):
+    def __init__(self, model_f, pc, dtype=torch.float32, device='cpu'):
         if not torch.is_tensor(pc):
-            self.pc = torch.tensor(pc)
+            self.pc = torch.tensor(pc, dtype=dtype, device=device)
         else:
-            self.pc = pc
+            self.pc = pc.to(dtype=dtype, device=device)
             
         self.model_f = model_f
 
@@ -132,35 +134,37 @@ class Individual(object):
         self.score = None
 
 
-def randomParams(min_bounds, max_bounds, device=torch.device('cpu')):
+def randomParams(min_bounds, max_bounds, device='cpu', dtype=torch.float32):
     sz = len(min_bounds)
     rand_params = []
     for i in range(sz):
         mini = min_bounds[i]
         maxi = max_bounds[i]
-        rp = torch.FloatTensor(1, 1).uniform_(mini, maxi).to(device)
+        rp = torch.empty(1, 1, dtype=dtype, device=device).uniform_(mini, maxi)
         rand_params.append(rp)
     return rand_params
 
 
-def mutateParams(params, min_bounds, max_bounds, device=torch.device('cpu')):
+def mutateParams(params, min_bounds, max_bounds, device='cpu', dtype=torch.float32):
     new_params = copy.deepcopy(params)
     sz = len(new_params)
     idx = numpy.random.randint(low=0, high=sz)
     minidx = min_bounds[idx]
     maxidx = max_bounds[idx]
-    new_params[idx] = torch.FloatTensor(1, 1).uniform_(minidx, maxidx).to(device)
+    new_params[idx] = torch.empty(1, 1, dtype=dtype, device=device).uniform_(minidx, maxidx)
     return new_params
 
 
-def regularizedEvolution(evaluator, lower_bounds, upper_bounds, cycles, population_size, sample_size):
+def regularizedEvolution(evaluator, lower_bounds, upper_bounds,
+                         cycles, population_size, sample_size,
+                         dtype=torch.float32, device='cpu'):
     population = collections.deque()
     history = []
 
     # initialize the population
     while (len(population) < population_size):
         c = Individual()
-        c.params = randomParams(lower_bounds, upper_bounds)
+        c.params = randomParams(lower_bounds, upper_bounds, device=device, dtype=dtype)
         c.score = evaluator.evalModel(c.params)
         population.append(c)
         history.append(c)
@@ -177,7 +181,7 @@ def regularizedEvolution(evaluator, lower_bounds, upper_bounds, cycles, populati
 
         # Add a mutated model and remove the oldest
         child = Individual()
-        child.params = mutateParams(parent.params, lower_bounds, upper_bounds)
+        child.params = mutateParams(parent.params, lower_bounds, upper_bounds, device=device, dtype=dtype)
         child.score = evaluator.evalModel(child.params)
         population.append(child)
         history.append(child)

@@ -4,14 +4,14 @@ from .diff import grad, div
 
 
 # Compute the mean curvature of f at v (v: points on the surface f=0)
-def meanCurvature(f, v):
+def meanCurvature(f, v, dtype=torch.float32, device='cpu'):
     '''
     Compute the mean curvature for the implicit surface f at the points v. 
     '''
     if not torch.is_tensor(v):
         # array.copy() is to prevent the case
         # where the numpy array has a negative stride
-        vt = torch.tensor(v.copy(), dtype=f.dtype, device=f.device)
+        vt = torch.tensor(v.copy(), dtype=dtype, device=device)
     else:
         vt = v
 
@@ -33,14 +33,14 @@ def meanCurvature(f, v):
     return mc
 
 
-def GaussianCurvature(f, v):
+def GaussianCurvature(f, v, dtype=torch.float32, device='cpu'):
     '''
     Compute the Gaussian curvature for the implicit surface f at the points v. 
     '''
     if not torch.is_tensor(v):
         # array.copy() is to prevent the case
         # where the numpy array has a negative stride
-        vt = torch.tensor(v.copy(), dtype=f.dtype, device=f.device)
+        vt = torch.tensor(v.copy(), dtype=dtype, device=device)
     else:
         vt = v
 
@@ -57,7 +57,7 @@ def GaussianCurvature(f, v):
     grad_ft = grad_ft.reshape((grad_ft.shape[0], grad_ft.shape[1], 1))
 
     # Hessian
-    H_ft = torch.zeros((v.shape[0], 3, 3), dtype=f.dtype, device=f.device)
+    H_ft = torch.zeros((v.shape[0], 3, 3), dtype=dtype, device=device)
     tmp0 = grad(grad_ft[:, 0], vt)
     H_ft[:, 0, 0] = tmp0[:, 0]
     H_ft[:, 0, 1] = tmp0[:, 1]
@@ -102,13 +102,13 @@ def GaussianCurvature(f, v):
     return Kg
 
 
-def principalCurvatures(f, v):
+def principalCurvatures(f, v, dtype=torch.float32, device='cpu'):
     '''
     Compute the principal curvatures kmin and kmax for the implicit surface f 
     at the points v. 
     '''
-    H = meanCurvature(f, v)
-    K = GaussianCurvature(f, v)
+    H = meanCurvature(f, v, dtype=dtype, device=device)
+    K = GaussianCurvature(f, v, dtype=dtype, device=device)
     h2k = torch.sqrt(H**2 - K)
     kmin = H - h2k
     kmax = H + h2k

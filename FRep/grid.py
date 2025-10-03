@@ -37,7 +37,7 @@ def npLinearSampling(model, xyz):
     return d
 
 
-def torchGrid(grid_min, grid_max, grid_res, device=torch.device('cpu')):
+def torchGrid(grid_min, grid_max, grid_res, device='cpu'):
     resx, resy, resz = grid_res
     dx = grid_max[0] - grid_min[0]
     x = torch.arange(grid_min[0], grid_max[0], step=dx / float(resx))
@@ -62,7 +62,7 @@ def torchSampling(model, x, y, z):
     return volume
 
 
-def torchLinearGrid(grid_min, grid_max, grid_res, device=torch.device('cpu')):
+def torchLinearGrid(grid_min, grid_max, grid_res, device='cpu'):
     resx, resy, resz = grid_res
     dx = grid_max[0] - grid_min[0]
     x = torch.arange(grid_min[0], grid_max[0], step=dx / float(resx))

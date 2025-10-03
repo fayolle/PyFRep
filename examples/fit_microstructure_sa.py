@@ -39,23 +39,31 @@ def model(p, param):
     return sphere_grid
 
 
-# Read a point cloud
-pc = readPointCloud('data/sphere_grid2.xyz')
-xyz = pc[:, 0:3]  # x,y,z coordinates only
+try:
+    # Read a point cloud
+    pc = readPointCloud('data/sphere_grid2.xyz')
+    xyz = pc[:, 0:3]  # x,y,z coordinates only
+    
+    # Loss function
+    loss_model = makeLossModel(model, xyz)
+    
+    # Fit with simulated annealing
+    lb = [1.0, 1.0, 0.1, 0.1]
+    ub = [10.0, 10.0, 2.0, 2.0]
+    res = dual_annealing(loss_model, bounds=list(zip(lb, ub)), seed=123)
+    print('Solution:')
+    print(res.x)
+    print(res.fun)
+    
+    # Fine tune with sgd
+    lb = [1.0, 1.0, 0.1, 0.1]
+    ub = [10.0, 10.0, 2.0, 2.0]
+    param = train(model, lb, ub, xyz, param_init=res.x, num_iters=100)
+    print(param)
 
-# Loss function
-loss_model = makeLossModel(model, xyz)
-
-# Fit with simulated annealing
-lb = [1.0, 1.0, 0.1, 0.1]
-ub = [10.0, 10.0, 2.0, 2.0]
-res = dual_annealing(loss_model, bounds=list(zip(lb, ub)), seed=123)
-print('Solution:')
-print(res.x)
-print(res.fun)
-
-# Fine tune with sgd
-lb = [1.0, 1.0, 0.1, 0.1]
-ub = [10.0, 10.0, 2.0, 2.0]
-param = train(model, lb, ub, xyz, param_init=res.x, num_iters=100)
-print(param)
+except FileNotFoundError as e:
+    print(f'File not found: {e}')
+except (IOError, ValueError) as e:
+    print(f'Failed to read point cloud: {e}')
+except Exception as e:
+    print(f'Unexpected error: {e}')

@@ -38,12 +38,20 @@ def model(p, param):
     return sphere_grid
 
 
-# Read a point cloud
-pc = readPointCloud('data/sphere_grid2.xyz')
-xyz = pc[:, 0:3]  # x,y,z coordinates only
+try:
+    # Read a point cloud
+    pc = readPointCloud('data/sphere_grid2.xyz')
+    xyz = pc[:, 0:3]  # x,y,z coordinates only
 
-# Fit with sgd
-lb = [1.0, 1.0, 0.1, 0.1]
-ub = [10.0, 10.0, 2.0, 2.0]
-param = train(model, lb, ub, xyz, num_iters=100)
-print(param)
+    # Fit with sgd
+    lb = [1.0, 1.0, 0.1, 0.1]
+    ub = [10.0, 10.0, 2.0, 2.0]
+    param = train(model, lb, ub, xyz, num_iters=100)
+    print(param)
+
+except FileNotFoundError as e:
+    print(f'File not found: {e}')
+except (IOError, ValueError) as e:
+    print(f'Failed to read point cloud: {e}')
+except Exception as e:
+    print(f'Unexpected error: {e}')

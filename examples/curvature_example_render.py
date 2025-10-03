@@ -30,9 +30,26 @@ Km = meanCurvature(model, v)
 Kg = GaussianCurvature(model, v)
 
 # Write to file
-print('Save to file')
-writeSurfaceMeshVTK('sphere_mean_curvature.vtk', v, f, Km)
-writeSurfaceMeshVTK('sphere_Gaussian_curvature.vtk', v, f, Kg)
+print('Saving to file')
+
+try:
+    writeSurfaceMeshVTK('sphere_mean_curvature.vtk', v, f, Km)
+except InvalidDataError as e:
+    print(f'Error: Invalid data')
+except IOError as e:
+    print(f'Error: Failed to write sphere_mean_curvature.vtk')
+except Exception as e:
+    print(f'Unexpected error')
+
+try:    
+    writeSurfaceMeshVTK('sphere_Gaussian_curvature.vtk', v, f, Kg)
+except InvalidDataError as e:
+    print(f'Error: Invalid data')
+except IOError as e:
+    print(f'Error: Failed to write sphere_Gaussian_curvature.vtk')
+except Exception as e:
+    print(f'Unexpected error')
+
 
 ps.init()
 ps.register_surface_mesh("mesh", v, f, smooth_shade=True)

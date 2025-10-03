@@ -22,4 +22,10 @@ v, f, n = evalToMesh(model,
                      grid_min=(-2, -2, -2),
                      grid_max=(2, 2, 2),
                      grid_res=(64, 64, 64))
-writeOFF('simple.off', v, f)
+
+try:
+    writeOFF('simple.off', v, f)
+except (InvalidDataError, TypeError, IOError) as e:
+    print(f'Failed to save simple.off: {e}')
+except Exception as e:
+    print(f'Unexpected error: {e}')

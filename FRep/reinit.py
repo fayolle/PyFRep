@@ -61,7 +61,7 @@ class ImplicitNNFun(nn.Module):
         return x
 
 
-def loadModel(path, dim=3, device=torch.device('cpu')):
+def loadModel(path, dim=3, device='cpu'):
     model = ImplicitNNFun(dim).to(device)
     try:
         checkpoint = torch.load(path,
@@ -95,7 +95,7 @@ def uniformSamples_generic(num_points, grid_min, grid_max, device):
     return x.to(device)
 
 
-def trainPPoisson(num_iters, fun, grid_min, grid_max, p=2, device=torch.device('cpu')):
+def trainPPoisson(num_iters, fun, grid_min, grid_max, p=2, device='cpu'):
     assert (len(grid_min) == len(grid_max))
     dimension = len(grid_min)
 
@@ -143,7 +143,7 @@ def trainPPoisson(num_iters, fun, grid_min, grid_max, p=2, device=torch.device('
     return model
 
 
-def trainEikonal(num_iters, fun, grid_min, grid_max, device=torch.device('cpu')):
+def trainEikonal(num_iters, fun, grid_min, grid_max, device='cpu'):
     assert (len(grid_min) == len(grid_max))
     dimension = len(grid_min)
 

@@ -125,11 +125,9 @@ def getUniformGrid(grid_min, grid_max, grid_res, device, indexing = 'mc'):
     elif (indexing == 'vtk'):
         xx, yy, zz = np.meshgrid(x, y, z, indexing='ij')
 
-    if device.type == 'cuda': 
-        grid_points = torch.tensor(np.vstack([xx.ravel(), yy.ravel(), zz.ravel()]).T, dtype=torch.float).cuda()
-    else:
-        grid_points = torch.tensor(np.vstack([xx.ravel(), yy.ravel(), zz.ravel()]).T, dtype=torch.float).cpu()
-
+    grid_points = torch.tensor(
+        np.vstack([xx.ravel(), yy.ravel(), zz.ravel()]).T, dtype=torch.float32, device=device)
+        
     return {"grid_points":grid_points, "xyz":[x,y,z], "resolution": [xx.shape[0], xx.shape[1], xx.shape[2]]}
 
 

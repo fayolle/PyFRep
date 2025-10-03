@@ -5,7 +5,7 @@ import torch.nn as nn
 from .grid import torchGrid, torchSampling, getUniformGrid 
 
 
-def evalToMesh(model, grid_min, grid_max, grid_res, device=torch.device('cpu')):
+def evalToMesh(model, grid_min, grid_max, grid_res, device='cpu'):
     x, y, z = torchGrid(grid_min, grid_max, grid_res, device)
     volume = torchSampling(model, x, y, z)
     volume = volume.detach().cpu().numpy()
@@ -33,7 +33,7 @@ def evalToMesh(model, grid_min, grid_max, grid_res, device=torch.device('cpu')):
     return vertices, faces, normals
 
 
-def evalToMesh2(model, grid_min, grid_max, grid_res, device = torch.device('cpu'), mc_value = 0.0):
+def evalToMesh2(model, grid_min, grid_max, grid_res, device='cpu', mc_value = 0.0):
     '''
     Return the triangle mesh (verts, faces), where 
     verts is the list of vertex coordinates 
